@@ -4,6 +4,8 @@ import com.example.demo.Domain.User;
 import com.example.demo.Service.UserService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class UserController {
     private UserService userService;
@@ -12,7 +14,17 @@ public class UserController {
         this.userService = userService;
     }
 
-    // @GetMapping("/user/create")
+    @GetMapping("/user/{id}")
+    public User fetchUserByID(@PathVariable("id") long id){
+        User fetchUser = this.userService.getUserByID(id);
+        return fetchUser;
+    }
+
+    @GetMapping("/user")
+    public List<User> fetchAllUsers(){
+        return this.userService.getAllUsers();
+    }
+
     @PostMapping("/user")
     public User createNewUser(
             @RequestBody User postManUser) {
@@ -28,5 +40,12 @@ public class UserController {
             this.userService.deleteUserByID(id);
         }
         return "xóa thành công";
+    }
+
+    @PutMapping("/user")
+    public User updateUser(
+            @RequestBody User postManUser){
+        User updateUser = this.userService.updateUser(postManUser);
+        return updateUser;
     }
 }
