@@ -16,4 +16,12 @@ public class UserService {
         User newUser = this.userRepository.save(user);
         return newUser;
     }
+
+    public User getUserByID(long id){
+        User getUser = this.userRepository.getReferenceById(id);
+        return getUser;
+    }
+    public void deleteUserByID(long id){
+        this.userRepository.deleteById(id);
+    }
 }
