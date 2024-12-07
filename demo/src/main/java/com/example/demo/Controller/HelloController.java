@@ -1,5 +1,6 @@
 package com.example.demo.Controller;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -7,6 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloController {
     @GetMapping("/")
     public String sayHello(){
-        return "Hello world!";
+        return "update Hello world!";
     }
 }
