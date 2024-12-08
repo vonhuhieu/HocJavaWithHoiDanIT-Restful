@@ -8,14 +8,23 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import java.util.ArrayList;
 import java.util.List;
 
-@RestControllerAdvice
+@ControllerAdvice
 public class GlobalException {
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<RestResponse<Object>> handleGeneralException(Exception ex) {
+        RestResponse<Object> res = new RestResponse<>();
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setError("URL Error");
+        res.setMessage("Something went wrong. Please check URL or your data and try again.");
+        ex.printStackTrace();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+
     @ExceptionHandler(value = {
             UsernameNotFoundException.class,
             BadCredentialsException.class
@@ -43,14 +52,14 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
-//    @ExceptionHandler(value = IDInvalidException.class)
-//    public ResponseEntity<RestResponse<Object>> handleIdException(IDInvalidException idInvalidException) {
-//        RestResponse res = new RestResponse();
-//        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-//        res.setError(idInvalidException.getMessage());
-//        res.setMessage("Vui lòng kiểm tra lại id");
-//        return ResponseEntity.badRequest().body(res);
-//    }
+    @ExceptionHandler(IDInvalidException.class)
+    public ResponseEntity<RestResponse<Object>> handleInvalidIDException(IDInvalidException ex){
+        RestResponse res = new RestResponse();
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setError("Invalid ID");
+        res.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
 
 
 }

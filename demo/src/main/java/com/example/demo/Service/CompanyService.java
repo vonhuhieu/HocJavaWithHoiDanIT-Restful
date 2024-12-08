@@ -3,6 +3,10 @@ package com.example.demo.Service;
 import com.example.demo.Domain.Company;
 import com.example.demo.Repository.CompanyRepository;
 import org.springframework.stereotype.Service;
+import com.example.demo.Util.Error.IDInvalidException;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CompanyService {
@@ -14,9 +18,46 @@ public class CompanyService {
 
     public Company createCompany(Company company){
         Company newCompany = company;
+        newCompany.setName(company.getName());
+        newCompany.setDescription(company.getDescription());
+        newCompany.setAddress(company.getAddress());
+        newCompany.setLogo(company.getLogo());
+        newCompany.setCreatedAt(company.getCreatedAt());
+        newCompany.setCreatedBy(company.getCreatedBy());
         this.companyRepository.save(newCompany);
         return newCompany;
     }
 
-    public List<Co>
+    public Company fetchCompanyById(long id){
+        Optional<Company> fetchCompanyByID = this.companyRepository.findById(id);
+        if (!fetchCompanyByID.isPresent()) {
+            throw new IDInvalidException("please check your ID");
+        }
+        return fetchCompanyByID.get();
+    }
+
+    public List<Company> fetchListCompanies(){
+        List<Company> listCompanies = this.companyRepository.findAll();
+        return listCompanies;
+    }
+
+    public Company updateCompany(Company updateCompany){
+        Company currentCompany = this.fetchCompanyById(updateCompany.getId());
+        currentCompany.setName(updateCompany.getName());
+        currentCompany.setDescription(updateCompany.getDescription());
+        currentCompany.setAddress(updateCompany.getAddress());
+        currentCompany.setLogo(updateCompany.getLogo());
+        currentCompany.setCreatedAt(updateCompany.getUpdatedAt());
+        currentCompany.setCreatedBy(updateCompany.getUpdatedBy());
+        this.companyRepository.save(currentCompany);
+        return currentCompany;
+    }
+
+    public void deleteCompanyByID(long id){
+        Optional<Company> deleteCompany = this.companyRepository.findById(id);
+        if (!deleteCompany.isPresent()) {
+            throw new IDInvalidException("No ID exists: " + id);
+        }
+        this.companyRepository.deleteById(id);
+    }
 }

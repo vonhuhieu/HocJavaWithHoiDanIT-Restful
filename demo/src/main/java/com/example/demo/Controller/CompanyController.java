@@ -6,9 +6,9 @@ import com.example.demo.Service.CompanyService;
 import com.example.demo.Util.ResponseUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class CompanyController {
@@ -24,5 +24,23 @@ public class CompanyController {
     public ResponseEntity<RestResponse<Object>> createNewCompany(@Valid @RequestBody Company postManCompany){
         Company newCompany = this.companyService.createCompany(postManCompany);
         return this.responseUtil.buildCreateResponse("create a company successfully", newCompany);
+    }
+
+    @GetMapping("/companies")
+    public ResponseEntity<RestResponse<Object>> fetchListCompanies(){
+        List<Company> listCompanies = this.companyService.fetchListCompanies();
+        return this.responseUtil.buildSuccessResponse("fetch listcompanies succesfully", listCompanies);
+    }
+
+    @PutMapping("/companies")
+    public ResponseEntity<RestResponse<Object>> updateCompany(@Valid @RequestBody Company postManCompany){
+        Company updateCompany = this.companyService.updateCompany(postManCompany);
+        return this.responseUtil.buildSuccessResponse("update the company successfully", updateCompany);
+    }
+
+    @DeleteMapping("/companies/{id}")
+    public ResponseEntity<RestResponse<Object>> deleteCompany(@PathVariable("id") long id) {
+        this.companyService.deleteCompanyByID(id);
+        return this.responseUtil.buildSuccessResponse("Delete the company successfully", null);
     }
 }
