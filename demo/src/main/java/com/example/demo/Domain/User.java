@@ -1,6 +1,7 @@
 package com.example.demo.Domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "users")
