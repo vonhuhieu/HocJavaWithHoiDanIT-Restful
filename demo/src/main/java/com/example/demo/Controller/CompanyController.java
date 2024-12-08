@@ -1,14 +1,19 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Domain.Company;
+import com.example.demo.Domain.DTO.ResultPaginationDTO;
 import com.example.demo.Domain.RestResponse;
 import com.example.demo.Service.CompanyService;
 import com.example.demo.Util.ResponseUtil;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class CompanyController {
@@ -21,19 +26,31 @@ public class CompanyController {
     }
 
     @PostMapping("/companies")
-    public ResponseEntity<RestResponse<Object>> createNewCompany(@Valid @RequestBody Company postManCompany){
+    public ResponseEntity<RestResponse<Object>> createNewCompany(@Valid @RequestBody Company postManCompany) {
         Company newCompany = this.companyService.createCompany(postManCompany);
         return this.responseUtil.buildCreateResponse("create a company successfully", newCompany);
     }
 
     @GetMapping("/companies")
-    public ResponseEntity<RestResponse<Object>> fetchListCompanies(){
-        List<Company> listCompanies = this.companyService.fetchListCompanies();
-        return this.responseUtil.buildSuccessResponse("fetch listcompanies succesfully", listCompanies);
+    public ResponseEntity<RestResponse<Object>> fetchListCompanies(
+            @RequestParam("current") Optional<String> currentOptional,
+            @RequestParam("pageSize") Optional<String> pageSizeOptional
+    ) {
+        String stringCurrent = currentOptional.isPresent() ? currentOptional.get() : "";
+        String stringPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "";
+        int current = Integer.parseInt(stringCurrent);
+        int pageSize = Integer.parseInt(stringPageSize);
+        Pageable pageable = PageRequest.of(current - 1, pageSize);
+        ResultPaginationDTO listCompanies = this.companyService.fetchListCompanies(pageable);
+        RestResponse res = new RestResponse();
+        res.setStatusCode(HttpStatus.OK.value());
+        res.setMessage("Get companies successfully");
+        res.setData(listCompanies);
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @PutMapping("/companies")
-    public ResponseEntity<RestResponse<Object>> updateCompany(@Valid @RequestBody Company postManCompany){
+    public ResponseEntity<RestResponse<Object>> updateCompany(@Valid @RequestBody Company postManCompany) {
         Company updateCompany = this.companyService.updateCompany(postManCompany);
         return this.responseUtil.buildSuccessResponse("update the company successfully", updateCompany);
     }

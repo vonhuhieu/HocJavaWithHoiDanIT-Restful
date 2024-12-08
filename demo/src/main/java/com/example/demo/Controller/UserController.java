@@ -57,17 +57,9 @@ public class UserController {
         int pageSize = Integer.parseInt(stringPageSize);
         Pageable pageable = PageRequest.of(current - 1, pageSize);
         ResultPaginationDTO listUsers = this.userService.getAllUsers(pageable);
-//        List<HashMap<String, String>> datalistUsers = new ArrayList<>();
-//        for (ResultPaginationDTO user : listUsers) {
-//            HashMap<String, String> userMap = new HashMap<>();
-//            userMap.put("id", Long.toString(user.getId()));
-//            userMap.put("email", user.getEmail());
-//            userMap.put("name", user.getName());
-//            datalistUsers.add(userMap);
-//        }
         RestResponse res = new RestResponse();
         res.setStatusCode(HttpStatus.OK.value());
-        res.setMessage("Get all users successfully");
+        res.setMessage("Get users successfully");
         res.setData(listUsers);
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
