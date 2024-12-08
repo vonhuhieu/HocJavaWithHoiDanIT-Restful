@@ -22,5 +22,7 @@ public class ResponseUtil {
         res.setData(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
+
+
 }
 

@@ -1,16 +1,19 @@
 package com.example.demo.Controller;
 
+import com.example.demo.Domain.DTO.ResultPaginationDTO;
 import com.example.demo.Domain.RestResponse;
 import com.example.demo.Domain.User;
 import com.example.demo.Util.Error.GlobalException;
 import com.example.demo.Service.UserService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UserController {
@@ -23,10 +26,10 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<RestResponse<Object>> fetchUserByID(@PathVariable("id") long id){
+    public ResponseEntity<RestResponse<Object>> fetchUserByID(@PathVariable("id") long id) {
         User fetchUser = this.userService.getUserByID(id);
         RestResponse res = new RestResponse();
-        if (fetchUser != null){
+        if (fetchUser != null) {
             HashMap<String, String> dataUser = new HashMap<>();
             dataUser.put("id", Long.toString(fetchUser.getId()));
             dataUser.put("email", fetchUser.getEmail());
@@ -43,20 +46,29 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<RestResponse<List<User>>> fetchAllUsers() {
-        List<User> listUsers = this.userService.getAllUsers();
-        List<HashMap<String, String>> datalistUsers = new ArrayList<>();
-        for (User user : listUsers){
-            HashMap<String, String> userMap = new HashMap<>();
-            userMap.put("id", Long.toString(user.getId()));
-            userMap.put("email", user.getEmail());
-            userMap.put("name", user.getName());
-            datalistUsers.add(userMap);
-        }
+    public ResponseEntity<RestResponse<ResultPaginationDTO>> fetchAllUsers(
+            @RequestParam("current") Optional<String> currentOptional,
+            @RequestParam("pageSize") Optional<String> pageSizeOptional
+
+    ) {
+        String stringCurrent = currentOptional.isPresent() ? currentOptional.get() : "";
+        String stringPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "";
+        int current = Integer.parseInt(stringCurrent);
+        int pageSize = Integer.parseInt(stringPageSize);
+        Pageable pageable = PageRequest.of(current - 1, pageSize);
+        ResultPaginationDTO listUsers = this.userService.getAllUsers(pageable);
+//        List<HashMap<String, String>> datalistUsers = new ArrayList<>();
+//        for (ResultPaginationDTO user : listUsers) {
+//            HashMap<String, String> userMap = new HashMap<>();
+//            userMap.put("id", Long.toString(user.getId()));
+//            userMap.put("email", user.getEmail());
+//            userMap.put("name", user.getName());
+//            datalistUsers.add(userMap);
+//        }
         RestResponse res = new RestResponse();
         res.setStatusCode(HttpStatus.OK.value());
         res.setMessage("Get all users successfully");
-        res.setData(datalistUsers);
+        res.setData(listUsers);
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
@@ -98,7 +110,7 @@ public class UserController {
             @RequestBody User postManUser) {
         RestResponse res = new RestResponse();
         User updateUser = this.userService.updateUser(postManUser);
-        if (updateUser != null){
+        if (updateUser != null) {
             HashMap<String, String> dataUser = new HashMap<>();
             dataUser.put("id", Long.toString(updateUser.getId()));
             dataUser.put("email", updateUser.getEmail());

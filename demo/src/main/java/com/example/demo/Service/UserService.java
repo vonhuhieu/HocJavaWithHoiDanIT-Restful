@@ -1,7 +1,11 @@
 package com.example.demo.Service;
 
+import com.example.demo.Domain.DTO.Meta;
+import com.example.demo.Domain.DTO.ResultPaginationDTO;
 import com.example.demo.Domain.User;
 import com.example.demo.Repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,8 +44,18 @@ public class UserService {
         this.userRepository.deleteById(id);
     }
 
-    public List<User> getAllUsers() {
-        return this.userRepository.findAll();
+    public ResultPaginationDTO getAllUsers(Pageable pageable) {
+        Page<User> pageUser = this.userRepository.findAll(pageable);
+        ResultPaginationDTO result = new ResultPaginationDTO();
+        Meta meta = new Meta();
+        meta.setPage(pageUser.getNumber());
+        meta.setPageSize(pageUser.getSize());
+        meta.setPages(pageUser.getTotalPages());
+        meta.setTotal(pageUser.getTotalElements());
+
+        result.setMeta(meta);
+        result.setResult(pageUser.getContent());
+        return result;
     }
 
     public User updateUser(User updateUser){
