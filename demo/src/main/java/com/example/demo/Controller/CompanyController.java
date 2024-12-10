@@ -5,9 +5,11 @@ import com.example.demo.Domain.DTO.ResultPaginationDTO;
 import com.example.demo.Domain.RestResponse;
 import com.example.demo.Service.CompanyService;
 import com.example.demo.Util.ResponseUtil;
+import com.turkraft.springfilter.boot.Filter;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,17 +33,27 @@ public class CompanyController {
         return this.responseUtil.buildCreateResponse("create a company successfully", newCompany);
     }
 
+//    @GetMapping("/companies")
+//    public ResponseEntity<RestResponse<Object>> fetchListCompanies(
+//            @RequestParam("current") Optional<String> currentOptional,
+//            @RequestParam("pageSize") Optional<String> pageSizeOptional
+//    ) {
+//        String stringCurrent = currentOptional.isPresent() ? currentOptional.get() : "";
+//        String stringPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "";
+//        int current = Integer.parseInt(stringCurrent);
+//        int pageSize = Integer.parseInt(stringPageSize);
+//        Pageable pageable = PageRequest.of(current - 1, pageSize);
+//        ResultPaginationDTO listCompanies = this.companyService.fetchListCompanies(pageable);
+//        RestResponse res = new RestResponse();
+//        res.setStatusCode(HttpStatus.OK.value());
+//        res.setMessage("Get companies successfully");
+//        res.setData(listCompanies);
+//        return ResponseEntity.status(HttpStatus.OK).body(res);
+//    }
+
     @GetMapping("/companies")
-    public ResponseEntity<RestResponse<Object>> fetchListCompanies(
-            @RequestParam("current") Optional<String> currentOptional,
-            @RequestParam("pageSize") Optional<String> pageSizeOptional
-    ) {
-        String stringCurrent = currentOptional.isPresent() ? currentOptional.get() : "";
-        String stringPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "";
-        int current = Integer.parseInt(stringCurrent);
-        int pageSize = Integer.parseInt(stringPageSize);
-        Pageable pageable = PageRequest.of(current - 1, pageSize);
-        ResultPaginationDTO listCompanies = this.companyService.fetchListCompanies(pageable);
+    public ResponseEntity<RestResponse<ResultPaginationDTO>> fetchListCompanies(@Filter Specification<Company> specification, Pageable pageable) {
+        ResultPaginationDTO listCompanies = this.companyService.fetchListCompanies(specification, pageable);
         RestResponse res = new RestResponse();
         res.setStatusCode(HttpStatus.OK.value());
         res.setMessage("Get companies successfully");

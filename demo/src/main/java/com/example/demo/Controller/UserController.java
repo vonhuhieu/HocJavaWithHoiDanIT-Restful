@@ -5,8 +5,10 @@ import com.example.demo.Domain.RestResponse;
 import com.example.demo.Domain.User;
 import com.example.demo.Util.Error.GlobalException;
 import com.example.demo.Service.UserService;
+import com.turkraft.springfilter.boot.Filter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,18 +47,32 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
+//    @GetMapping("/users")
+//    public ResponseEntity<RestResponse<ResultPaginationDTO>> fetchAllUsers(
+//            @Filter Specification specification
+////            @RequestParam("current") Optional<String> currentOptional,
+////            @RequestParam("pageSize") Optional<String> pageSizeOptional
+//
+//    ) {
+////        String stringCurrent = currentOptional.isPresent() ? currentOptional.get() : "";
+////        String stringPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "";
+////        int current = Integer.parseInt(stringCurrent);
+////        int pageSize = Integer.parseInt(stringPageSize);
+////        Pageable pageable = PageRequest.of(current - 1, pageSize);
+//        ResultPaginationDTO listUsers = this.userService.getAllUsers(specification);
+//        RestResponse res = new RestResponse();
+//        res.setStatusCode(HttpStatus.OK.value());
+//        res.setMessage("Get users successfully");
+//        res.setData(listUsers);
+//        return ResponseEntity.status(HttpStatus.OK).body(res);
+//    }
+
     @GetMapping("/users")
     public ResponseEntity<RestResponse<ResultPaginationDTO>> fetchAllUsers(
-            @RequestParam("current") Optional<String> currentOptional,
-            @RequestParam("pageSize") Optional<String> pageSizeOptional
-
+            @Filter Specification<User> specification,
+            Pageable pageable
     ) {
-        String stringCurrent = currentOptional.isPresent() ? currentOptional.get() : "";
-        String stringPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "";
-        int current = Integer.parseInt(stringCurrent);
-        int pageSize = Integer.parseInt(stringPageSize);
-        Pageable pageable = PageRequest.of(current - 1, pageSize);
-        ResultPaginationDTO listUsers = this.userService.getAllUsers(pageable);
+        ResultPaginationDTO listUsers = this.userService.getAllUsers(specification, pageable);
         RestResponse res = new RestResponse();
         res.setStatusCode(HttpStatus.OK.value());
         res.setMessage("Get users successfully");
