@@ -1,50 +1,37 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Domain.DTO.ResultPaginationDTO;
+import com.example.demo.Domain.DTO.UserFormatDataResponseDTO;
 import com.example.demo.Domain.RestResponse;
 import com.example.demo.Domain.User;
 import com.example.demo.Util.Error.GlobalException;
 import com.example.demo.Service.UserService;
+import com.example.demo.Util.ResponseUtil;
 import com.turkraft.springfilter.boot.Filter;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+
 
 @RestController
+// config version
+@RequestMapping("/api/v1")
 public class UserController {
     private UserService userService;
     private GlobalException globalException;
+    private ResponseUtil responseUtil;
 
-    public UserController(UserService userService, GlobalException globalException) {
+    public UserController(UserService userService, GlobalException globalException, ResponseUtil responseUtil) {
         this.userService = userService;
         this.globalException = globalException;
+        this.responseUtil = responseUtil;
     }
 
     @GetMapping("/users/{id}")
     public ResponseEntity<RestResponse<Object>> fetchUserByID(@PathVariable("id") long id) {
-        User fetchUser = this.userService.getUserByID(id);
-        RestResponse res = new RestResponse();
-        if (fetchUser != null) {
-            HashMap<String, String> dataUser = new HashMap<>();
-            dataUser.put("id", Long.toString(fetchUser.getId()));
-            dataUser.put("email", fetchUser.getEmail());
-            dataUser.put("name", fetchUser.getName());
-            res.setStatusCode(HttpStatus.OK.value());
-            res.setData(dataUser);
-            res.setMessage("Tìm user thành công");
-            return ResponseEntity.status(HttpStatus.OK).body(res);
-        }
-        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError("Invalid ID");
-        res.setMessage("ID không tồn tại");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        UserFormatDataResponseDTO fetchUser = this.userService.fetchUserByID(id);
+        return this.responseUtil.buildSuccessResponse("Get the user successfully", fetchUser);
     }
 
 //    @GetMapping("/users")
@@ -68,70 +55,33 @@ public class UserController {
 //    }
 
     @GetMapping("/users")
-    public ResponseEntity<RestResponse<ResultPaginationDTO>> fetchAllUsers(
+    public ResponseEntity<RestResponse<Object>> fetchAllUsers(
             @Filter Specification<User> specification,
             Pageable pageable
     ) {
-        ResultPaginationDTO listUsers = this.userService.getAllUsers(specification, pageable);
-        RestResponse res = new RestResponse();
-        res.setStatusCode(HttpStatus.OK.value());
-        res.setMessage("Get users successfully");
-        res.setData(listUsers);
-        return ResponseEntity.status(HttpStatus.OK).body(res);
+        ResultPaginationDTO resultPaginationDTO = this.userService.getAllUsers(specification, pageable);
+        return this.responseUtil.buildSuccessResponse("get users successfully", resultPaginationDTO);
     }
 
 
     @PostMapping("/users")
     public ResponseEntity<RestResponse<Object>> createNewUser(
             @RequestBody User postManUser) {
-        User user = new User();
-        user = this.userService.handleCreateUser(postManUser);
-        RestResponse res = new RestResponse();
-        res.setStatusCode(HttpStatus.CREATED.value());
-        res.setMessage("Create a user succesfully");
-        HashMap<String, String> dataUser = new HashMap<>();
-        dataUser.put("id", Long.toString(user.getId()));
-        dataUser.put("email", user.getEmail());
-        dataUser.put("name", user.getName());
-        res.setData(dataUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+        UserFormatDataResponseDTO newUser = this.userService.handleCreateUser(postManUser);
+        return this.responseUtil.buildCreateResponse("create a new user successfully", newUser);
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<Object> deleteUser(@PathVariable("id") long id) {
-        User deleteUser = this.userService.getUserByID(id);
-        RestResponse res = new RestResponse();
-        if (deleteUser != null) {
-            this.userService.deleteUserByID(id);
-            res.setStatusCode(HttpStatus.OK.value());
-            res.setMessage("Xoa nguoi dung thanh cong");
-            return ResponseEntity.status(HttpStatus.OK).body(res);
-        }
-        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError("Invalid ID");
-        res.setMessage("ID không tồn tại");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    public ResponseEntity<RestResponse<Object>> deleteUser(@PathVariable("id") long id) {
+        this.userService.deleteUserByID(id);
+        return this.responseUtil.buildSuccessResponse("delete the user successfully", null);
     }
 
     @PutMapping("/users")
     public ResponseEntity<RestResponse<Object>> updateUser(
             @RequestBody User postManUser) {
-        RestResponse res = new RestResponse();
-        User updateUser = this.userService.updateUser(postManUser);
-        if (updateUser != null) {
-            HashMap<String, String> dataUser = new HashMap<>();
-            dataUser.put("id", Long.toString(updateUser.getId()));
-            dataUser.put("email", updateUser.getEmail());
-            dataUser.put("name", updateUser.getName());
-            res.setStatusCode(HttpStatus.OK.value());
-            res.setData(dataUser);
-            res.setMessage("Tìm user thành công");
-            return ResponseEntity.status(HttpStatus.OK).body(res);
-        }
-        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError("Invalid ID");
-        res.setMessage("ID không tồn tại");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        UserFormatDataResponseDTO newUserFormatDataResponseDTO = this.userService.updateUser(postManUser);
+        return this.responseUtil.buildSuccessResponse("update a user successfully", newUserFormatDataResponseDTO);
     }
 
 }

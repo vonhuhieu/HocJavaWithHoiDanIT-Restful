@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ResponseUtil {
+    // format API khi gọi thành công
     public ResponseEntity<RestResponse<Object>> buildSuccessResponse(String message, Object data){
         RestResponse res = new RestResponse<>();
         res.setStatusCode(HttpStatus.OK.value());
@@ -18,6 +19,7 @@ public class ResponseUtil {
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
+    // format API khi tạo dữ liệu thành công
     public ResponseEntity<RestResponse<Object>> buildCreateResponse(String message, Object data){
         RestResponse res = new RestResponse<>();
         res.setStatusCode(HttpStatus.CREATED.value());

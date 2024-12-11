@@ -45,6 +45,7 @@ public class CompanyService {
         Page<Company> pageCompany = this.companyRepository.findAll(specification, pageable);
         ResultPaginationDTO result = new ResultPaginationDTO();
         Meta meta = new Meta();
+        // lấy từ pageable vì đây là 2 thông số mà frontend truyền lên
         meta.setPage(pageable.getPageNumber() + 1);
         meta.setPageSize(pageable.getPageSize());
 

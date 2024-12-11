@@ -26,6 +26,7 @@ public class SecurityUtil {
     @Value("${hoidanit.jwt.token-validity-in-seconds}")
     private long jwtKeyExpiration;
 
+    // tạo token khi đăng nhập thành công
     public String createToken(Authentication authentication) {
         Instant now = Instant.now();
         Instant validity = now.plus(this.jwtKeyExpiration, ChronoUnit.SECONDS);
@@ -48,6 +49,7 @@ public class SecurityUtil {
      *
      * @return the login of the current user.
      */
+    // lấy thông tin user sau khi đăng nhập, tương tự Auth:: bên laravel
     public static Optional<String> getCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));

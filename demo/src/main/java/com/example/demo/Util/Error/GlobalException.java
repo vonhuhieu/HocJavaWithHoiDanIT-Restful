@@ -61,5 +61,12 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
-
+    @ExceptionHandler(ExistsByData.class)
+    public ResponseEntity<RestResponse<Object>> handleExistsByData(ExistsByData ex){
+        RestResponse res = new RestResponse();
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setError("Data already exists");
+        res.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
 }
