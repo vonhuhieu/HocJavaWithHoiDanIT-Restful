@@ -4,7 +4,6 @@ import com.example.demo.Domain.DTO.ResultPaginationDTO;
 import com.example.demo.Domain.DTO.UserFormatDataResponseDTO;
 import com.example.demo.Domain.RestResponse;
 import com.example.demo.Domain.User;
-import com.example.demo.Util.Error.GlobalException;
 import com.example.demo.Service.UserService;
 import com.example.demo.Util.ResponseUtil;
 import com.turkraft.springfilter.boot.Filter;
@@ -19,15 +18,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1")
 public class UserController {
     private UserService userService;
-    private GlobalException globalException;
     private ResponseUtil responseUtil;
 
-    public UserController(UserService userService, GlobalException globalException, ResponseUtil responseUtil) {
+    public UserController(UserService userService, ResponseUtil responseUtil) {
         this.userService = userService;
-        this.globalException = globalException;
         this.responseUtil = responseUtil;
     }
-
+    //
     @GetMapping("/users/{id}")
     public ResponseEntity<RestResponse<Object>> fetchUserByID(@PathVariable("id") long id) {
         UserFormatDataResponseDTO fetchUser = this.userService.fetchUserByID(id);
@@ -63,7 +60,6 @@ public class UserController {
         return this.responseUtil.buildSuccessResponse("get users successfully", resultPaginationDTO);
     }
 
-
     @PostMapping("/users")
     public ResponseEntity<RestResponse<Object>> createNewUser(
             @RequestBody User postManUser) {
@@ -77,6 +73,7 @@ public class UserController {
         return this.responseUtil.buildSuccessResponse("delete the user successfully", null);
     }
 
+    //
     @PutMapping("/users")
     public ResponseEntity<RestResponse<Object>> updateUser(
             @RequestBody User postManUser) {

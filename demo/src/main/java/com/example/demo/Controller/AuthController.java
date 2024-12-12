@@ -1,7 +1,12 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Domain.DTO.LoginDTO;
+import com.example.demo.Domain.DTO.UserDataLoginSuccessfullyDTO;
+import com.example.demo.Domain.DTO.UserDataResponseLoginSuccessfullyDTO;
 import com.example.demo.Domain.RestResponse;
+import com.example.demo.Repository.UserRepository;
+import com.example.demo.Service.UserService;
+import com.example.demo.Util.ResponseUtil;
 import com.example.demo.Util.SecurityUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,10 +28,14 @@ import java.util.HashMap;
 public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
+    private final UserRepository userRepository;
+    private final ResponseUtil responseUtil;
 
-    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil) {
+    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil, UserRepository userRepository, ResponseUtil responseUtil) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
+        this.userRepository = userRepository;
+        this.responseUtil = responseUtil;
     }
 
     @PostMapping("/login")
@@ -41,12 +50,16 @@ public class AuthController {
         // create a token
         String access_token = this.securityUtil.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        RestResponse res = new RestResponse();
-        res.setStatusCode(HttpStatus.OK.value());
-        res.setMessage("Dang nhap thanh cong");
-        HashMap<String, String> data = new HashMap<>();
-        data.put("access_token", access_token);
-        res.setData(data);
-        return ResponseEntity.ok().body(res);
+        String emailUser = authentication.getName();
+        long idUser = this.userRepository.findByEmail(emailUser).getId();
+        String nameUser = this.userRepository.findByEmail(emailUser).getName();
+        UserDataLoginSuccessfullyDTO userDataLoginSuccessfullyDTO = new UserDataLoginSuccessfullyDTO();
+        userDataLoginSuccessfullyDTO.setId(idUser);
+        userDataLoginSuccessfullyDTO.setEmail(emailUser);
+        userDataLoginSuccessfullyDTO.setName(nameUser);
+        UserDataResponseLoginSuccessfullyDTO userDataResponseLoginSuccessfullyDTO = new UserDataResponseLoginSuccessfullyDTO();
+        userDataResponseLoginSuccessfullyDTO.setAccessToken(access_token);
+        userDataResponseLoginSuccessfullyDTO.setUserDataLoginSuccessfullyDTO(userDataLoginSuccessfullyDTO);
+        return this.responseUtil.buildSuccessResponse("Login successfully", userDataResponseLoginSuccessfullyDTO);
     }
 }

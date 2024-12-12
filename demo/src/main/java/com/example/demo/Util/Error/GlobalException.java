@@ -18,11 +18,11 @@ public class GlobalException {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<RestResponse<Object>> handleGeneralException(Exception ex) {
         RestResponse<Object> res = new RestResponse<>();
-        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setStatusCode(HttpStatus.NOT_FOUND.value());
         res.setError("URL Error");
         res.setMessage("Something went wrong. Please check URL or your data and try again.");
         ex.printStackTrace();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
     }
 
     @ExceptionHandler(value = {
