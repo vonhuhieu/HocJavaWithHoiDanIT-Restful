@@ -10,6 +10,8 @@ import com.example.demo.Service.UserService;
 import com.example.demo.Util.Error.IDInvalidException;
 import com.example.demo.Util.ResponseUtil;
 import com.example.demo.Util.SecurityUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -110,6 +112,7 @@ public class AuthController {
             @CookieValue(name = "refreshToken", defaultValue = "errorToken") String refreshToken
     ){
         if (refreshToken.equals("errorToken")){
+
             throw new IDInvalidException("No refreshToken in cookie");
         }
         // check valid
@@ -151,5 +154,23 @@ public class AuthController {
         newRes.setMessage("Get user by refreshToken successfully");
         newRes.setData(userDataResponseLoginSuccessfullyDTO);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(newRes);
+    }
+
+    @PostMapping("/auth/logout")
+    public ResponseEntity<RestResponse<Object>> userLogOut(HttpServletResponse response){
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() ?
+                SecurityUtil.getCurrentUserLogin().get() : "";
+        User currentUser = this.userRepository.findByEmail(email);
+        if (currentUser == null){
+            throw new IDInvalidException("No user exists");
+        }
+        this.userService.updateUserToken(null, currentUser.getEmail());
+        Cookie deleteServletCookie = new Cookie("refreshToken", null);
+        deleteServletCookie.setMaxAge(0);
+        deleteServletCookie.setPath("/");
+        deleteServletCookie.setHttpOnly(true);
+        deleteServletCookie.setSecure(true);
+        response.addCookie(deleteServletCookie);
+        return this.responseUtil.buildSuccessResponse("logout successfully", null);
     }
 }
