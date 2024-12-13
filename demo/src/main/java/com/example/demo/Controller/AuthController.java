@@ -9,7 +9,10 @@ import com.example.demo.Service.UserService;
 import com.example.demo.Util.ResponseUtil;
 import com.example.demo.Util.SecurityUtil;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -30,14 +33,17 @@ public class AuthController {
     private final SecurityUtil securityUtil;
     private final UserRepository userRepository;
     private final ResponseUtil responseUtil;
+    private final UserService userService;
+    @Value("${hoidanit.jwt.refresh-token-validity-in-seconds}")
+    private long refreshTokenExpiration;
 
-    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil, UserRepository userRepository, ResponseUtil responseUtil) {
+    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil, UserRepository userRepository, ResponseUtil responseUtil, UserService userService) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
         this.userRepository = userRepository;
         this.responseUtil = responseUtil;
+        this.userService = userService;
     }
-
     @PostMapping("/login")
     public ResponseEntity<RestResponse<Object>> login(@Valid @RequestBody LoginDTO loginDTO) {
         //Nạp input gồm username/password vào Security
@@ -48,7 +54,7 @@ public class AuthController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         // create a token
-        String access_token = this.securityUtil.createToken(authentication);
+        String access_token = this.securityUtil.createAccessToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String emailUser = authentication.getName();
         long idUser = this.userRepository.findByEmail(emailUser).getId();
@@ -60,6 +66,25 @@ public class AuthController {
         UserDataResponseLoginSuccessfullyDTO userDataResponseLoginSuccessfullyDTO = new UserDataResponseLoginSuccessfullyDTO();
         userDataResponseLoginSuccessfullyDTO.setAccessToken(access_token);
         userDataResponseLoginSuccessfullyDTO.setUserDataLoginSuccessfullyDTO(userDataLoginSuccessfullyDTO);
-        return this.responseUtil.buildSuccessResponse("Login successfully", userDataResponseLoginSuccessfullyDTO);
+
+        // create refreshToken
+        String refreshToken = this.securityUtil.createRefreshToken(emailUser, userDataLoginSuccessfullyDTO);
+        this.userService.updateUserToken(refreshToken, emailUser);
+
+        // set cookies
+        ResponseCookie responseCookie = ResponseCookie
+                .from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(refreshTokenExpiration)
+                .build();
+
+        // set lai response
+        RestResponse newRes = new RestResponse();
+        newRes.setStatusCode(HttpStatus.OK.value());
+        newRes.setMessage("login successfully");
+        newRes.setData(userDataResponseLoginSuccessfullyDTO);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(newRes);
     }
 }
