@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -53,6 +54,8 @@ public class AuthController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         // create a token
+
+        // set thong tin nguoi dung login vao context (co the su dung sau nay)
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String emailUser = authentication.getName();
         long idUser = this.userRepository.findByEmail(emailUser).getId();
@@ -97,5 +100,15 @@ public class AuthController {
         userDataLoginSuccessfullyDTO.setEmail(currentUser.getEmail());
         userDataLoginSuccessfullyDTO.setName(currentUser.getName());
         return this.responseUtil.buildSuccessResponse("get account successfully", userDataLoginSuccessfullyDTO);
+    }
+
+    @GetMapping("/auth/refresh")
+    public ResponseEntity<String> getRefreshToken(
+            @CookieValue(name = "refreshToken") String refreshToken
+    ){
+        // check valid
+        Jwt decodedToken = this.securityUtil.checkValidRefreshToken(refreshToken);
+        String email = decodedToken.getSubject();
+        return ResponseEntity.ok().body(email);
     }
 }
