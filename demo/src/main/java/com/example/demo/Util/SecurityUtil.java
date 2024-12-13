@@ -33,7 +33,7 @@ public class SecurityUtil {
     private long refreshTokenExpiration;
 
     // tạo token khi đăng nhập thành công
-    public String createAccessToken(Authentication authentication) {
+    public String createAccessToken(Authentication authentication, UserDataLoginSuccessfullyDTO userDataLoginSuccessfullyDTO) {
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
@@ -43,7 +43,7 @@ public class SecurityUtil {
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(authentication.getName())
-                .claim("hoidanit", authentication)
+                .claim("user", userDataLoginSuccessfullyDTO)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

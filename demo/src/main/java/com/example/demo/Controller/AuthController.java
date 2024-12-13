@@ -4,6 +4,7 @@ import com.example.demo.Domain.DTO.LoginDTO;
 import com.example.demo.Domain.DTO.UserDataLoginSuccessfullyDTO;
 import com.example.demo.Domain.DTO.UserDataResponseLoginSuccessfullyDTO;
 import com.example.demo.Domain.RestResponse;
+import com.example.demo.Domain.User;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Service.UserService;
 import com.example.demo.Util.ResponseUtil;
@@ -17,10 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 
@@ -44,7 +42,8 @@ public class AuthController {
         this.responseUtil = responseUtil;
         this.userService = userService;
     }
-    @PostMapping("/login")
+
+    @PostMapping("/auth/login")
     public ResponseEntity<RestResponse<Object>> login(@Valid @RequestBody LoginDTO loginDTO) {
         //Nạp input gồm username/password vào Security
         UsernamePasswordAuthenticationToken authenticationToken
@@ -54,7 +53,6 @@ public class AuthController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         // create a token
-        String access_token = this.securityUtil.createAccessToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String emailUser = authentication.getName();
         long idUser = this.userRepository.findByEmail(emailUser).getId();
@@ -64,6 +62,7 @@ public class AuthController {
         userDataLoginSuccessfullyDTO.setEmail(emailUser);
         userDataLoginSuccessfullyDTO.setName(nameUser);
         UserDataResponseLoginSuccessfullyDTO userDataResponseLoginSuccessfullyDTO = new UserDataResponseLoginSuccessfullyDTO();
+        String access_token = this.securityUtil.createAccessToken(authentication, userDataLoginSuccessfullyDTO);
         userDataResponseLoginSuccessfullyDTO.setAccessToken(access_token);
         userDataResponseLoginSuccessfullyDTO.setUserDataLoginSuccessfullyDTO(userDataLoginSuccessfullyDTO);
 
@@ -86,5 +85,17 @@ public class AuthController {
         newRes.setMessage("login successfully");
         newRes.setData(userDataResponseLoginSuccessfullyDTO);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(newRes);
+    }
+
+    @GetMapping("/auth/account")
+    public ResponseEntity<RestResponse<Object>>  getAccount(){
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() ?
+                SecurityUtil.getCurrentUserLogin().get() : "";
+        User currentUser = this.userRepository.findByEmail(email);
+        UserDataLoginSuccessfullyDTO userDataLoginSuccessfullyDTO = new UserDataLoginSuccessfullyDTO();
+        userDataLoginSuccessfullyDTO.setId(currentUser.getId());
+        userDataLoginSuccessfullyDTO.setEmail(currentUser.getEmail());
+        userDataLoginSuccessfullyDTO.setName(currentUser.getName());
+        return this.responseUtil.buildSuccessResponse("get account successfully", userDataLoginSuccessfullyDTO);
     }
 }
