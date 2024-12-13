@@ -1,8 +1,7 @@
 package com.example.demo.Service;
 
-import com.example.demo.Domain.DTO.Meta;
-import com.example.demo.Domain.DTO.ResultPaginationDTO;
-import com.example.demo.Domain.DTO.UserFormatDataResponseDTO;
+import com.example.demo.Domain.DTO.Response.ResultPaginationDTO;
+import com.example.demo.Domain.DTO.Response.UserFormatDataResponseDTO;
 import com.example.demo.Domain.User;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Util.Error.ExistsByData;
@@ -40,8 +39,6 @@ public class UserService {
         newUser.setAddress(user.getAddress());
         newUser.setAge(user.getAge());
         newUser.setGender(user.getGender());
-        newUser.setCreatedAt(user.getCreatedAt());
-        newUser.setCreatedBy(user.getCreatedBy());
         this.userRepository.save(newUser);
         UserFormatDataResponseDTO newUserFormatDataResponseDTO = new UserFormatDataResponseDTO();
         newUserFormatDataResponseDTO.setId(newUser.getId());
@@ -50,8 +47,8 @@ public class UserService {
         newUserFormatDataResponseDTO.setGender(newUser.getGender());
         newUserFormatDataResponseDTO.setAddress(newUser.getAddress());
         newUserFormatDataResponseDTO.setAge(newUser.getAge());
-        newUserFormatDataResponseDTO.setCreatedAt(newUser.getCreatedAt());
         newUserFormatDataResponseDTO.setCreatedBy(newUser.getCreatedBy());
+        newUserFormatDataResponseDTO.setCreatedAt(newUser.getCreatedAt());
         return newUserFormatDataResponseDTO;
     }
 
@@ -76,10 +73,6 @@ public class UserService {
         newUserFormatDataResponseDTO.setGender(fetchUser.getGender());
         newUserFormatDataResponseDTO.setAddress(fetchUser.getAddress());
         newUserFormatDataResponseDTO.setAge(fetchUser.getAge());
-        newUserFormatDataResponseDTO.setCreatedAt(fetchUser.getCreatedAt());
-        newUserFormatDataResponseDTO.setCreatedBy(fetchUser.getCreatedBy());
-        newUserFormatDataResponseDTO.setUpdatedAt(fetchUser.getUpdatedAt());
-        newUserFormatDataResponseDTO.setUpdatedBy(fetchUser.getUpdatedBy());
         return newUserFormatDataResponseDTO;
     }
 
@@ -94,7 +87,7 @@ public class UserService {
     public ResultPaginationDTO getAllUsers(Specification<User> specification, Pageable pageable) {
         Page<User> pageUser = this.userRepository.findAll(specification, pageable);
         ResultPaginationDTO result = new ResultPaginationDTO();
-        Meta meta = new Meta();
+        ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
         // lấy từ pageable vì đây là 2 thông số mà frontend truyền lên
         meta.setPage(pageable.getPageNumber() + 1);
         meta.setPageSize(pageable.getPageSize());
@@ -107,6 +100,7 @@ public class UserService {
         for (User user : pageUser.getContent()){
             UserFormatDataResponseDTO newUserFormatDataResponseDTO = new UserFormatDataResponseDTO();
             newUserFormatDataResponseDTO.setId(user.getId());
+            newUserFormatDataResponseDTO.setEmail(user.getEmail());
             newUserFormatDataResponseDTO.setName(user.getName());
             newUserFormatDataResponseDTO.setGender(user.getGender());
             newUserFormatDataResponseDTO.setAddress(user.getAddress());
@@ -133,12 +127,15 @@ public class UserService {
         this.userRepository.save(currentUser);
         UserFormatDataResponseDTO newUserFormatDataResponseDTO = new UserFormatDataResponseDTO();
         newUserFormatDataResponseDTO.setId(currentUser.getId());
+        newUserFormatDataResponseDTO.setEmail(currentUser.getEmail());
         newUserFormatDataResponseDTO.setName(currentUser.getName());
         newUserFormatDataResponseDTO.setGender(currentUser.getGender());
         newUserFormatDataResponseDTO.setAddress(currentUser.getAddress());
         newUserFormatDataResponseDTO.setAge(currentUser.getAge());
-        newUserFormatDataResponseDTO.setUpdatedAt(currentUser.getUpdatedAt());
+        newUserFormatDataResponseDTO.setCreatedAt(currentUser.getCreatedAt());
+        newUserFormatDataResponseDTO.setCreatedBy(currentUser.getCreatedBy());
         newUserFormatDataResponseDTO.setUpdatedBy(currentUser.getUpdatedBy());
+        newUserFormatDataResponseDTO.setUpdatedAt(currentUser.getUpdatedAt());
         return newUserFormatDataResponseDTO;
     }
 

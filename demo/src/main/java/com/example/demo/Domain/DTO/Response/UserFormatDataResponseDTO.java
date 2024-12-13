@@ -1,4 +1,4 @@
-package com.example.demo.Domain.DTO;
+package com.example.demo.Domain.DTO.Response;
 
 import com.example.demo.Util.Enum.GenderEnum;
 import org.springframework.stereotype.Component;
@@ -98,4 +98,5 @@ public class UserFormatDataResponseDTO {
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
+
 }

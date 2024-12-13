@@ -1,8 +1,8 @@
 package com.example.demo.Controller;
 
-import com.example.demo.Domain.DTO.LoginDTO;
-import com.example.demo.Domain.DTO.UserDataLoginSuccessfullyDTO;
-import com.example.demo.Domain.DTO.UserDataResponseLoginSuccessfullyDTO;
+import com.example.demo.Domain.DTO.Request.RequestLoginDTO;
+import com.example.demo.Domain.DTO.Response.UserDataLoginSuccessfullyDTO;
+import com.example.demo.Domain.DTO.Response.UserDataResponseLoginSuccessfullyDTO;
 import com.example.demo.Domain.RestResponse;
 import com.example.demo.Domain.User;
 import com.example.demo.Repository.UserRepository;
@@ -25,9 +25,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-
-import java.util.HashMap;
-
 @RestController
 @RequestMapping("/api/v1")
 public class AuthController {
@@ -48,7 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<RestResponse<Object>> login(@Valid @RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<RestResponse<Object>> login(@Valid @RequestBody RequestLoginDTO loginDTO) {
         //Nạp input gồm username/password vào Security
         UsernamePasswordAuthenticationToken authenticationToken
                 = new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword());
@@ -104,7 +101,9 @@ public class AuthController {
         userDataLoginSuccessfullyDTO.setId(currentUser.getId());
         userDataLoginSuccessfullyDTO.setEmail(currentUser.getEmail());
         userDataLoginSuccessfullyDTO.setName(currentUser.getName());
-        return this.responseUtil.buildSuccessResponse("get account successfully", userDataLoginSuccessfullyDTO);
+        UserDataLoginSuccessfullyDTO.userGetAccount userLogin = new UserDataLoginSuccessfullyDTO.userGetAccount();
+        userLogin.setUser(userDataLoginSuccessfullyDTO);
+        return this.responseUtil.buildSuccessResponse("get account successfully", userLogin);
     }
 
     @GetMapping("/auth/refresh")
@@ -128,11 +127,7 @@ public class AuthController {
         userDataLoginSuccessfullyDTO.setId(currentUser.getId());
         userDataLoginSuccessfullyDTO.setEmail(currentUser.getEmail());
         userDataLoginSuccessfullyDTO.setName(currentUser.getName());
-        UserDataResponseLoginSuccessfullyDTO userDataResponseLoginSuccessfullyDTO = new UserDataResponseLoginSuccessfullyDTO();
         String access_token = this.securityUtil.createAccessToken(email, userDataLoginSuccessfullyDTO);
-        userDataResponseLoginSuccessfullyDTO.setAccessToken(access_token);
-        userDataResponseLoginSuccessfullyDTO.setUserDataLoginSuccessfullyDTO(userDataLoginSuccessfullyDTO);
-
         // create refreshToken
         String newRefreshToken = this.securityUtil.createRefreshToken(email, userDataLoginSuccessfullyDTO);
 
@@ -152,6 +147,11 @@ public class AuthController {
         RestResponse newRes = new RestResponse();
         newRes.setStatusCode(HttpStatus.OK.value());
         newRes.setMessage("Get user by refreshToken successfully");
+        UserDataLoginSuccessfullyDTO.userGetAccount userLogin = new UserDataLoginSuccessfullyDTO.userGetAccount();
+        userLogin.setUser(userDataLoginSuccessfullyDTO);
+        UserDataResponseLoginSuccessfullyDTO userDataResponseLoginSuccessfullyDTO = new UserDataResponseLoginSuccessfullyDTO();
+        userDataResponseLoginSuccessfullyDTO.setAccessToken(access_token);
+        userDataResponseLoginSuccessfullyDTO.setUserDataLoginSuccessfullyDTO(userDataLoginSuccessfullyDTO);
         newRes.setData(userDataResponseLoginSuccessfullyDTO);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(newRes);
     }

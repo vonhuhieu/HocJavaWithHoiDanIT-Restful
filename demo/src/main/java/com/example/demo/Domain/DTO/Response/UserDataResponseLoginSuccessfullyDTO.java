@@ -1,4 +1,4 @@
-package com.example.demo.Domain.DTO;
+package com.example.demo.Domain.DTO.Response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.stereotype.Component;

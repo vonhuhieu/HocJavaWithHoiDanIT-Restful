@@ -1,4 +1,4 @@
-package com.example.demo.Domain.DTO;
+package com.example.demo.Domain.DTO.Response;
 
 import org.springframework.stereotype.Component;
 
@@ -30,5 +30,17 @@ public class UserDataLoginSuccessfullyDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public static class userGetAccount{
+        private UserDataLoginSuccessfullyDTO user;
+
+        public UserDataLoginSuccessfullyDTO getUser() {
+            return user;
+        }
+
+        public void setUser(UserDataLoginSuccessfullyDTO user) {
+            this.user = user;
+        }
     }
 }
