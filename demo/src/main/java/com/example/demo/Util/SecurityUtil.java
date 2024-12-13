@@ -39,7 +39,7 @@ public class SecurityUtil {
     private long refreshTokenExpiration;
 
     // tạo token khi đăng nhập thành công
-    public String createAccessToken(Authentication authentication, UserDataLoginSuccessfullyDTO userDataLoginSuccessfullyDTO) {
+    public String createAccessToken(String email, UserDataLoginSuccessfullyDTO userDataLoginSuccessfullyDTO) {
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
@@ -50,7 +50,7 @@ public class SecurityUtil {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
-                .subject(authentication.getName())
+                .subject(email)
                 .claim("user", userDataLoginSuccessfullyDTO)
                 .claim("permission", listAuthority)
                 .build();

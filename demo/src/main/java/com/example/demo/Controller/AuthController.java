@@ -7,6 +7,7 @@ import com.example.demo.Domain.RestResponse;
 import com.example.demo.Domain.User;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Service.UserService;
+import com.example.demo.Util.Error.IDInvalidException;
 import com.example.demo.Util.ResponseUtil;
 import com.example.demo.Util.SecurityUtil;
 import jakarta.validation.Valid;
@@ -65,12 +66,14 @@ public class AuthController {
         userDataLoginSuccessfullyDTO.setEmail(emailUser);
         userDataLoginSuccessfullyDTO.setName(nameUser);
         UserDataResponseLoginSuccessfullyDTO userDataResponseLoginSuccessfullyDTO = new UserDataResponseLoginSuccessfullyDTO();
-        String access_token = this.securityUtil.createAccessToken(authentication, userDataLoginSuccessfullyDTO);
+        String access_token = this.securityUtil.createAccessToken(authentication.getName(), userDataLoginSuccessfullyDTO);
         userDataResponseLoginSuccessfullyDTO.setAccessToken(access_token);
         userDataResponseLoginSuccessfullyDTO.setUserDataLoginSuccessfullyDTO(userDataLoginSuccessfullyDTO);
 
         // create refreshToken
         String refreshToken = this.securityUtil.createRefreshToken(emailUser, userDataLoginSuccessfullyDTO);
+
+        // update user
         this.userService.updateUserToken(refreshToken, emailUser);
 
         // set cookies
@@ -103,12 +106,50 @@ public class AuthController {
     }
 
     @GetMapping("/auth/refresh")
-    public ResponseEntity<String> getRefreshToken(
-            @CookieValue(name = "refreshToken") String refreshToken
+    public ResponseEntity<RestResponse<Object>> getRefreshToken(
+            @CookieValue(name = "refreshToken", defaultValue = "errorToken") String refreshToken
     ){
+        if (refreshToken.equals("errorToken")){
+            throw new IDInvalidException("No refreshToken in cookie");
+        }
         // check valid
         Jwt decodedToken = this.securityUtil.checkValidRefreshToken(refreshToken);
         String email = decodedToken.getSubject();
-        return ResponseEntity.ok().body(email);
+
+        // check user by token + email
+        User currentUser = this.userService.getUserByRefreshTokenAndEmail(refreshToken, email);
+        if (currentUser == null){
+            throw new IDInvalidException("Refresh Token khong hop le");
+        }
+        UserDataLoginSuccessfullyDTO userDataLoginSuccessfullyDTO = new UserDataLoginSuccessfullyDTO();
+        userDataLoginSuccessfullyDTO.setId(currentUser.getId());
+        userDataLoginSuccessfullyDTO.setEmail(currentUser.getEmail());
+        userDataLoginSuccessfullyDTO.setName(currentUser.getName());
+        UserDataResponseLoginSuccessfullyDTO userDataResponseLoginSuccessfullyDTO = new UserDataResponseLoginSuccessfullyDTO();
+        String access_token = this.securityUtil.createAccessToken(email, userDataLoginSuccessfullyDTO);
+        userDataResponseLoginSuccessfullyDTO.setAccessToken(access_token);
+        userDataResponseLoginSuccessfullyDTO.setUserDataLoginSuccessfullyDTO(userDataLoginSuccessfullyDTO);
+
+        // create refreshToken
+        String newRefreshToken = this.securityUtil.createRefreshToken(email, userDataLoginSuccessfullyDTO);
+
+        // update user
+        this.userService.updateUserToken(newRefreshToken, email);
+
+        // set cookies
+        ResponseCookie responseCookie = ResponseCookie
+                .from("refreshToken", newRefreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(refreshTokenExpiration)
+                .build();
+
+        // set lai response
+        RestResponse newRes = new RestResponse();
+        newRes.setStatusCode(HttpStatus.OK.value());
+        newRes.setMessage("Get user by refreshToken successfully");
+        newRes.setData(userDataResponseLoginSuccessfullyDTO);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(newRes);
     }
 }
