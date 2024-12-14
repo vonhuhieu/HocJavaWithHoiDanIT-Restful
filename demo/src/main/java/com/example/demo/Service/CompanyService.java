@@ -2,21 +2,27 @@ package com.example.demo.Service;
 
 import com.example.demo.Domain.Company;
 import com.example.demo.Domain.DTO.Response.ResultPaginationDTO;
+import com.example.demo.Domain.User;
 import com.example.demo.Repository.CompanyRepository;
+import com.example.demo.Repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import com.example.demo.Util.Error.IDInvalidException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class CompanyService {
     private CompanyRepository companyRepository;
+    private UserRepository userRepository;
 
-    public CompanyService(CompanyRepository companyRepository) {
+    public CompanyService(CompanyRepository companyRepository, UserRepository userRepository) {
         this.companyRepository = companyRepository;
+        this.userRepository = userRepository;
     }
 
     public Company createCompany(Company company) {
@@ -32,7 +38,7 @@ public class CompanyService {
     public Company fetchCompanyById(long id) {
         Optional<Company> fetchCompanyByID = this.companyRepository.findById(id);
         if (!fetchCompanyByID.isPresent()) {
-            throw new IDInvalidException("please check your ID");
+            throw new IDInvalidException("please check ID's company");
         }
         return fetchCompanyByID.get();
     }
@@ -47,7 +53,6 @@ public class CompanyService {
 
         meta.setPages(pageCompany.getTotalPages());
         meta.setTotal(pageCompany.getTotalElements());
-
         result.setMeta(meta);
         result.setResult(pageCompany.getContent());
         return result;
@@ -68,6 +73,9 @@ public class CompanyService {
         if (!deleteCompany.isPresent()) {
             throw new IDInvalidException("No ID exists: " + id);
         }
+        //xóa users thuộc company trước, sau đó mơới xóa company
+        List<User> listUsers = deleteCompany.get().getUsers();
+        this.userRepository.deleteAll(listUsers);
         this.companyRepository.deleteById(id);
     }
 }

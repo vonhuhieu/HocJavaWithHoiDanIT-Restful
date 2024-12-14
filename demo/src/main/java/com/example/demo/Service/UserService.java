@@ -1,5 +1,7 @@
 package com.example.demo.Service;
 
+import com.example.demo.Domain.Company;
+import com.example.demo.Domain.DTO.Response.CompanyDTO;
 import com.example.demo.Domain.DTO.Response.ResultPaginationDTO;
 import com.example.demo.Domain.DTO.Response.UserFormatDataResponseDTO;
 import com.example.demo.Domain.User;
@@ -20,18 +22,24 @@ import java.util.Optional;
 public class UserService {
     private UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CompanyService companyService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, CompanyService companyService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.companyService = companyService;
     }
 
     public UserFormatDataResponseDTO handleCreateUser(User user) {
-        User newUser = new User();
         boolean checkEmailExists = this.userRepository.existsByEmail(user.getEmail());
         if (checkEmailExists){
             throw new ExistsByData("Email is already used by other person");
         }
+        Company company = this.companyService.fetchCompanyById(user.getCompany().getId());
+        CompanyDTO companyDTO = new CompanyDTO();
+        companyDTO.setId(company.getId());
+        companyDTO.setName(company.getName());
+        User newUser = new User();
         newUser.setEmail(user.getEmail());
         newUser.setName(user.getName());
         String hashPassword = this.passwordEncoder.encode(user.getPassword());
@@ -39,6 +47,7 @@ public class UserService {
         newUser.setAddress(user.getAddress());
         newUser.setAge(user.getAge());
         newUser.setGender(user.getGender());
+        newUser.setCompany(company);
         this.userRepository.save(newUser);
         UserFormatDataResponseDTO newUserFormatDataResponseDTO = new UserFormatDataResponseDTO();
         newUserFormatDataResponseDTO.setId(newUser.getId());
@@ -49,6 +58,7 @@ public class UserService {
         newUserFormatDataResponseDTO.setAge(newUser.getAge());
         newUserFormatDataResponseDTO.setCreatedBy(newUser.getCreatedBy());
         newUserFormatDataResponseDTO.setCreatedAt(newUser.getCreatedAt());
+        newUserFormatDataResponseDTO.setCompanyDTO(companyDTO);
         return newUserFormatDataResponseDTO;
     }
 
@@ -67,12 +77,21 @@ public class UserService {
             throw new IDInvalidException("No exists ID " + id);
         }
         User fetchUser = fetchUserByID.get();
+        CompanyDTO companyDTO = new CompanyDTO();
+        companyDTO.setId(fetchUser.getCompany().getId());
+        companyDTO.setName(fetchUser.getCompany().getName());
         UserFormatDataResponseDTO newUserFormatDataResponseDTO = new UserFormatDataResponseDTO();
         newUserFormatDataResponseDTO.setId(fetchUser.getId());
+        newUserFormatDataResponseDTO.setEmail(fetchUser.getEmail());
         newUserFormatDataResponseDTO.setName(fetchUser.getName());
         newUserFormatDataResponseDTO.setGender(fetchUser.getGender());
         newUserFormatDataResponseDTO.setAddress(fetchUser.getAddress());
         newUserFormatDataResponseDTO.setAge(fetchUser.getAge());
+        newUserFormatDataResponseDTO.setCreatedAt(fetchUser.getCreatedAt());
+        newUserFormatDataResponseDTO.setCreatedBy(fetchUser.getCreatedBy());
+        newUserFormatDataResponseDTO.setUpdatedBy(fetchUser.getUpdatedBy());
+        newUserFormatDataResponseDTO.setUpdatedAt(fetchUser.getUpdatedAt());
+        newUserFormatDataResponseDTO.setCompanyDTO(companyDTO);
         return newUserFormatDataResponseDTO;
     }
 
@@ -98,6 +117,10 @@ public class UserService {
         result.setMeta(meta);
         List<UserFormatDataResponseDTO> listUsers = new ArrayList<>();
         for (User user : pageUser.getContent()){
+            Company company = user.getCompany();
+            CompanyDTO companyDTO = new CompanyDTO();
+            companyDTO.setId(company.getId());
+            companyDTO.setName(company.getName());
             UserFormatDataResponseDTO newUserFormatDataResponseDTO = new UserFormatDataResponseDTO();
             newUserFormatDataResponseDTO.setId(user.getId());
             newUserFormatDataResponseDTO.setEmail(user.getEmail());
@@ -107,8 +130,9 @@ public class UserService {
             newUserFormatDataResponseDTO.setAge(user.getAge());
             newUserFormatDataResponseDTO.setCreatedAt(user.getCreatedAt());
             newUserFormatDataResponseDTO.setCreatedBy(user.getCreatedBy());
-            newUserFormatDataResponseDTO.setUpdatedAt(user.getUpdatedAt());
             newUserFormatDataResponseDTO.setUpdatedBy(user.getUpdatedBy());
+            newUserFormatDataResponseDTO.setUpdatedAt(user.getUpdatedAt());
+            newUserFormatDataResponseDTO.setCompanyDTO(companyDTO);
             listUsers.add(newUserFormatDataResponseDTO);
         }
         result.setResult(listUsers);
@@ -120,10 +144,15 @@ public class UserService {
         if(currentUser == null){
             throw new IDInvalidException("no exists ID " + updateUser.getId());
         }
+        Company company = this.companyService.fetchCompanyById(updateUser.getCompany().getId());
+        CompanyDTO companyDTO = new CompanyDTO();
+        companyDTO.setId(company.getId());
+        companyDTO.setName(company.getName());
         currentUser.setName(updateUser.getName());
         currentUser.setGender(updateUser.getGender());
         currentUser.setAge(updateUser.getAge());
         currentUser.setAddress(updateUser.getAddress());
+        currentUser.setCompany(company);
         this.userRepository.save(currentUser);
         UserFormatDataResponseDTO newUserFormatDataResponseDTO = new UserFormatDataResponseDTO();
         newUserFormatDataResponseDTO.setId(currentUser.getId());
@@ -136,6 +165,7 @@ public class UserService {
         newUserFormatDataResponseDTO.setCreatedBy(currentUser.getCreatedBy());
         newUserFormatDataResponseDTO.setUpdatedBy(currentUser.getUpdatedBy());
         newUserFormatDataResponseDTO.setUpdatedAt(currentUser.getUpdatedAt());
+        newUserFormatDataResponseDTO.setCompanyDTO(companyDTO);
         return newUserFormatDataResponseDTO;
     }
 

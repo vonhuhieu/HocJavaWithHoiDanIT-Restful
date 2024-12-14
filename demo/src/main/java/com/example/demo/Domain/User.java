@@ -33,6 +33,19 @@ public class User {
     private String createdBy;
     private String updatedBy;
 
+    // Many users => 1 company
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
+
     @PrePersist
     public void handleBeforeCreate() {
         this.createdBy = SecurityUtil.getCurrentUserLogin().isPresent() == true

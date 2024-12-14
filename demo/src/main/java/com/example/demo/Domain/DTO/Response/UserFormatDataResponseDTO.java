@@ -1,6 +1,7 @@
 package com.example.demo.Domain.DTO.Response;
 
 import com.example.demo.Util.Enum.GenderEnum;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -15,6 +16,19 @@ public class UserFormatDataResponseDTO {
     private int age;
     private Instant createdAt;
     private String createdBy;
+    private Instant updatedAt;
+    private String updatedBy;
+
+    @JsonProperty("company")
+    private CompanyDTO companyDTO;
+
+    public CompanyDTO getCompanyDTO() {
+        return companyDTO;
+    }
+
+    public void setCompanyDTO(CompanyDTO companyDTO) {
+        this.companyDTO = companyDTO;
+    }
 
     public Instant getUpdatedAt() {
         return updatedAt;
@@ -31,9 +45,6 @@ public class UserFormatDataResponseDTO {
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
-
-    private Instant updatedAt;
-    private String updatedBy;
 
     public long getId() {
         return id;
