@@ -1,46 +1,49 @@
 package com.example.demo.Domain;
 
+import com.example.demo.Util.Enum.LevelEnum;
+import com.example.demo.Util.SecurityUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
 import java.time.Instant;
 import java.util.List;
 
-import com.example.demo.Util.SecurityUtil;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-
 @Entity
-@Table(name = "companies")
-public class Company {
-
+@Table(name = "jobs")
+public class Job {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotBlank(message = "tên công ty khoong được để trống")
     private String name;
+    private String location;
+    private double salary;
+    private int quantity;
+
+    @Enumerated(EnumType.STRING)
+    private LevelEnum level;
 
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
 
-    private String address;
-    private String logo;
-
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+    private Instant startDate;
+    private Instant endDate;
+    private boolean isActive;
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
 
-    // 1 company => many users
-    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
-    @JsonIgnore // không trả về đối tượng khi query
-    List<User> users;
+    // manyJobs => 1 company
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
 
-    // 1 company => many jobs
-    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnore
-    List<Job> jobs;
+    @JoinTable(name = "job_skill", joinColumns = @JoinColumn(name = "job_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
+    private List<Skill> skills;
+
 
     @PrePersist
     public void handleBeforeCreate() {
@@ -51,7 +54,7 @@ public class Company {
     }
 
     @PreUpdate
-    public void handleBeforeUpdate(){
+    public void handleBeforeUpdate() {
         this.updatedAt = Instant.now();
         this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
                 ? SecurityUtil.getCurrentUserLogin().get()
@@ -74,6 +77,38 @@ public class Company {
         this.name = name;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(double salary) {
+        this.salary = salary;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public LevelEnum getLevel() {
+        return level;
+    }
+
+    public void setLevel(LevelEnum level) {
+        this.level = level;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -82,20 +117,28 @@ public class Company {
         this.description = description;
     }
 
-    public String getAddress() {
-        return address;
+    public Instant getStartDate() {
+        return startDate;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setStartDate(Instant startDate) {
+        this.startDate = startDate;
     }
 
-    public String getLogo() {
-        return logo;
+    public Instant getEndDate() {
+        return endDate;
     }
 
-    public void setLogo(String logo) {
-        this.logo = logo;
+    public void setEndDate(Instant endDate) {
+        this.endDate = endDate;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public Instant getCreatedAt() {
@@ -130,19 +173,11 @@ public class Company {
         this.updatedBy = updatedBy;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public Company getCompany() {
+        return company;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
-    public List<Job> getJobs() {
-        return jobs;
-    }
-
-    public void setJobs(List<Job> jobs) {
-        this.jobs = jobs;
+    public void setCompany(Company company) {
+        this.company = company;
     }
 }
