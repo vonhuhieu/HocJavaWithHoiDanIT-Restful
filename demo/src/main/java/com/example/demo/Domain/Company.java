@@ -34,7 +34,7 @@ public class Company {
 
     // 1 company => many users
     @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonIgnore // không trả về đối tượng khi query
     List<User> users;
 
     public List<User> getUsers() {
