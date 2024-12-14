@@ -1,32 +1,23 @@
-package com.example.demo.Domain;
+package com.example.demo.Domain.DTO.Response;
 
+import com.example.demo.Domain.Company;
+import com.example.demo.Domain.Skill;
 import com.example.demo.Util.Enum.LevelEnum;
-import com.example.demo.Util.SecurityUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.List;
 
-@Entity
-@Table(name = "jobs")
-public class Job {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class JobDTO {
     private long id;
-
     private String name;
     private String location;
     private double salary;
     private int quantity;
-
-    @Enumerated(EnumType.STRING)
     private LevelEnum level;
-
-    @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
-
     private Instant startDate;
     private Instant endDate;
     private boolean active;
@@ -35,31 +26,10 @@ public class Job {
     private String createdBy;
     private String updatedBy;
 
-    // manyJobs => 1 company
-    @ManyToOne
-    @JoinColumn(name = "company_id")
-    private Company company;
+    @JsonProperty("company")
+    private CompanyDTO companyDTO;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "jobs" }) // khi trả ra jobs sẽ lấy skills, nhưng mỗi skills sẽ bỏ qua các jobs
-    @JoinTable(name = "job_skill", joinColumns = @JoinColumn(name = "job_id"), inverseJoinColumns = @JoinColumn(name = "skill_id"))
-    private List<Skill> skills;
-
-    @PrePersist
-    public void handleBeforeCreate() {
-        this.createdBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
-                ? SecurityUtil.getCurrentUserLogin().get()
-                : "";
-        this.createdAt = Instant.now();
-    }
-
-    @PreUpdate
-    public void handleBeforeUpdate() {
-        this.updatedAt = Instant.now();
-        this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
-                ? SecurityUtil.getCurrentUserLogin().get()
-                : "";
-    }
+    private List<String> skills;
 
     public long getId() {
         return id;
@@ -133,6 +103,14 @@ public class Job {
         this.endDate = endDate;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }
@@ -165,27 +143,19 @@ public class Job {
         this.updatedBy = updatedBy;
     }
 
-    public Company getCompany() {
-        return company;
+    public CompanyDTO getCompanyDTO() {
+        return companyDTO;
     }
 
-    public void setCompany(Company company) {
-        this.company = company;
+    public void setCompanyDTO(CompanyDTO companyDTO) {
+        this.companyDTO = companyDTO;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public List<Skill> getSkills() {
+    public List<String> getSkills() {
         return skills;
     }
 
-    public void setSkills(List<Skill> skills) {
+    public void setSkills(List<String> skills) {
         this.skills = skills;
     }
 }

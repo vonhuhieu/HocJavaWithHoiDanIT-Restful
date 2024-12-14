@@ -3,6 +3,7 @@ package com.example.demo.Domain;
 import com.example.demo.Util.SecurityUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.Instant;
 import java.util.List;
@@ -14,6 +15,7 @@ public class Skill {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotBlank(message = "Skill's name must not be empty")
     private String name;
     private Instant createdAt;
     private String createdBy;
