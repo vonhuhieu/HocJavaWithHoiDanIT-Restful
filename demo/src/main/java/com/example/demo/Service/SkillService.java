@@ -1,7 +1,9 @@
 package com.example.demo.Service;
 
 import com.example.demo.Domain.DTO.Response.ResultPaginationDTO;
+import com.example.demo.Domain.Job;
 import com.example.demo.Domain.Skill;
+import com.example.demo.Repository.JobRepository;
 import com.example.demo.Repository.SkillRepository;
 import com.example.demo.Util.Error.ExistsByData;
 import com.example.demo.Util.Error.IDInvalidException;
@@ -10,14 +12,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class SkillService {
     private SkillRepository skillRepository;
+    private JobRepository jobRepository;
 
-    public SkillService(SkillRepository skillRepository) {
+    public SkillService(SkillRepository skillRepository, JobRepository jobRepository) {
         this.skillRepository = skillRepository;
+        this.jobRepository = jobRepository;
     }
 
     public Skill createSkill(Skill skill){
@@ -59,5 +64,18 @@ public class SkillService {
         result.setMeta(meta);
         result.setResult(pageSkill.getContent());
         return result;
+    }
+
+    public void deleteSkill(long id){
+        Optional<Skill> fetchSkillById = this.skillRepository.findById(id);
+        if (fetchSkillById.isEmpty()){
+            throw new IDInvalidException("No exists skill whose id = " + id);
+        }
+        List<Job> listJobs = fetchSkillById.get().getJobs();
+        // khi xoa skill luu y tim den list jobs co chua skill do va xoa di, chu khong phai xoa luon ca job
+        for (Job job :listJobs){
+            job.getSkills().remove(fetchSkillById.get());
+        }
+        this.skillRepository.deleteById(fetchSkillById.get().getId());
     }
 }

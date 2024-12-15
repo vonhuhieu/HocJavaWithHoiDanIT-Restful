@@ -40,4 +40,10 @@ public class SkillController {
         ResultPaginationDTO listSkills = this.skillService.fetchListSkills(specification, pageable);
         return this.responseUtil.buildSuccessResponse("Get list skills successfully", listSkills);
     }
+
+    @DeleteMapping("/skills/{id}")
+    public ResponseEntity<RestResponse<Object>> deleteSkill(@PathVariable("id") long id){
+        this.skillService.deleteSkill(id);
+        return this.responseUtil.buildSuccessResponse("Delete the skills successfully", null);
+    }
 }
