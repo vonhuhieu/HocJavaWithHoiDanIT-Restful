@@ -70,4 +70,9 @@ public class CompanyController {
         this.companyService.deleteCompanyByID(id);
         return this.responseUtil.buildSuccessResponse("Delete the company successfully", null);
     }
+
+    @GetMapping("/companies/{id}")
+    public ResponseEntity<RestResponse<Object>> fetchCompanyById(@PathVariable("id") long id){
+        return this.responseUtil.buildSuccessResponse("Fetch the company successfully", this.companyService.fetchCompanyById(id));
+    }
 }

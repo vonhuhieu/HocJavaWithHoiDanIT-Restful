@@ -15,6 +15,9 @@ public class ResumeFetchByIdDTO {
     private Instant updatedAt;
     private String updatedBy;
 
+    @JsonProperty("company")
+    private String companyName;
+
     @JsonProperty("user")
     private UserOfResumeDTO userOfResumeDTO;
 
@@ -100,5 +103,13 @@ public class ResumeFetchByIdDTO {
 
     public void setJobOfResumeDTO(JobOfResumeDTO jobOfResumeDTO) {
         this.jobOfResumeDTO = jobOfResumeDTO;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 }

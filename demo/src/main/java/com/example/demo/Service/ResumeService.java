@@ -5,6 +5,7 @@ import com.example.demo.Domain.DTO.Response.Company.CompanyDTO;
 import com.example.demo.Domain.DTO.Response.Job.JobDTO;
 import com.example.demo.Domain.DTO.Response.Pagination.ResultPaginationDTO;
 import com.example.demo.Domain.DTO.Response.Resume.*;
+import com.example.demo.Repository.CompanyRepository;
 import com.example.demo.Repository.JobRepository;
 import com.example.demo.Repository.ResumeRepository;
 import com.example.demo.Repository.UserRepository;
@@ -23,11 +24,13 @@ public class ResumeService {
     private ResumeRepository resumeRepository;
     private JobRepository jobRepository;
     private UserRepository userRepository;
+    private CompanyRepository companyRepository;
 
-    public ResumeService(ResumeRepository resumeRepository, JobRepository jobRepository, UserRepository userRepository) {
+    public ResumeService(ResumeRepository resumeRepository, JobRepository jobRepository, UserRepository userRepository, CompanyRepository companyRepository) {
         this.resumeRepository = resumeRepository;
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
+        this.companyRepository = companyRepository;
     }
 
     public ResumeDTO createResume(Resume resume){
@@ -105,6 +108,12 @@ public class ResumeService {
         JobOfResumeDTO jobOfResumeDTO = new JobOfResumeDTO();
         jobOfResumeDTO.setId(checkJobExists.get().getId());
         jobOfResumeDTO.setName(checkJobExists.get().getName());
+        Company company = checkJobExists.get().getCompany();
+        Optional<Company> checkCompanyExists = this.companyRepository.findById(company.getId());
+        if (checkCompanyExists.isEmpty()){
+            throw new IDInvalidException("No exists company whose id = " + company.getId());
+        }
+        resumeFetchByIdDTO.setCompanyName(checkCompanyExists.get().getName());
         resumeFetchByIdDTO.setUserOfResumeDTO(userOfResumeDTO);
         resumeFetchByIdDTO.setJobOfResumeDTO(jobOfResumeDTO);
         return resumeFetchByIdDTO;
@@ -148,6 +157,12 @@ public class ResumeService {
             JobOfResumeDTO jobOfResumeDTO = new JobOfResumeDTO();
             jobOfResumeDTO.setId(checkJobExists.get().getId());
             jobOfResumeDTO.setName(checkJobExists.get().getName());
+            Company company = checkJobExists.get().getCompany();
+            Optional<Company> checkCompanyExists = this.companyRepository.findById(company.getId());
+            if (checkCompanyExists.isEmpty()){
+                throw new IDInvalidException("No exists company whose id = " + company.getId());
+            }
+            resumeFetchByIdDTO.setCompanyName(checkCompanyExists.get().getName());
             resumeFetchByIdDTO.setUserOfResumeDTO(userOfResumeDTO);
             resumeFetchByIdDTO.setJobOfResumeDTO(jobOfResumeDTO);
             listResumes.add(resumeFetchByIdDTO);
