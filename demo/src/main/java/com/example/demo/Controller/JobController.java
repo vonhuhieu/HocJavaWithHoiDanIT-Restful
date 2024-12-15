@@ -1,7 +1,7 @@
 package com.example.demo.Controller;
 
-import com.example.demo.Domain.DTO.Response.JobDTO;
-import com.example.demo.Domain.DTO.Response.ResultPaginationDTO;
+import com.example.demo.Domain.DTO.Response.Job.JobDTO;
+import com.example.demo.Domain.DTO.Response.Pagination.ResultPaginationDTO;
 import com.example.demo.Domain.Job;
 import com.example.demo.Domain.RestResponse;
 import com.example.demo.Service.JobService;

@@ -1,5 +1,6 @@
-package com.example.demo.Domain.DTO.Response;
+package com.example.demo.Domain.DTO.Response.User;
 
+import com.example.demo.Domain.DTO.Response.Company.CompanyDTO;
 import com.example.demo.Util.Enum.GenderEnum;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.stereotype.Component;

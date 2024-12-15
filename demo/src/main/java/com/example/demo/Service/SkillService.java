@@ -1,6 +1,6 @@
 package com.example.demo.Service;
 
-import com.example.demo.Domain.DTO.Response.ResultPaginationDTO;
+import com.example.demo.Domain.DTO.Response.Pagination.ResultPaginationDTO;
 import com.example.demo.Domain.Job;
 import com.example.demo.Domain.Skill;
 import com.example.demo.Repository.JobRepository;

@@ -1,4 +1,4 @@
-package com.example.demo.Domain.DTO.Response;
+package com.example.demo.Domain.DTO.Response.User;
 
 import org.springframework.stereotype.Component;
 

@@ -1,11 +1,8 @@
-package com.example.demo.Domain.DTO.Response;
+package com.example.demo.Domain.DTO.Response.Job;
 
-import com.example.demo.Domain.Company;
-import com.example.demo.Domain.Skill;
+import com.example.demo.Domain.DTO.Response.Company.CompanyDTO;
 import com.example.demo.Util.Enum.LevelEnum;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.List;

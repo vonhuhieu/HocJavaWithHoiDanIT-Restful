@@ -1,6 +1,6 @@
 package com.example.demo.Controller;
 
-import com.example.demo.Domain.DTO.Response.ResultPaginationDTO;
+import com.example.demo.Domain.DTO.Response.Pagination.ResultPaginationDTO;
 import com.example.demo.Domain.RestResponse;
 import com.example.demo.Domain.Skill;
 import com.example.demo.Service.SkillService;

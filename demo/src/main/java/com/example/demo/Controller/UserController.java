@@ -1,7 +1,7 @@
 package com.example.demo.Controller;
 
-import com.example.demo.Domain.DTO.Response.ResultPaginationDTO;
-import com.example.demo.Domain.DTO.Response.UserFormatDataResponseDTO;
+import com.example.demo.Domain.DTO.Response.Pagination.ResultPaginationDTO;
+import com.example.demo.Domain.DTO.Response.User.UserFormatDataResponseDTO;
 import com.example.demo.Domain.RestResponse;
 import com.example.demo.Domain.User;
 import com.example.demo.Service.UserService;

@@ -1,8 +1,8 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Domain.DTO.Request.RequestLoginDTO;
-import com.example.demo.Domain.DTO.Response.UserDataLoginSuccessfullyDTO;
-import com.example.demo.Domain.DTO.Response.UserDataResponseLoginSuccessfullyDTO;
+import com.example.demo.Domain.DTO.Response.User.UserDataLoginSuccessfullyDTO;
+import com.example.demo.Domain.DTO.Response.User.UserDataResponseLoginSuccessfullyDTO;
 import com.example.demo.Domain.RestResponse;
 import com.example.demo.Domain.User;
 import com.example.demo.Repository.UserRepository;

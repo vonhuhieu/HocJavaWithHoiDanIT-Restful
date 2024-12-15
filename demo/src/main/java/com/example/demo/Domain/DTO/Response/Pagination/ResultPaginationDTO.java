@@ -1,4 +1,4 @@
-package com.example.demo.Domain.DTO.Response;
+package com.example.demo.Domain.DTO.Response.Pagination;
 
 import org.springframework.stereotype.Component;
 

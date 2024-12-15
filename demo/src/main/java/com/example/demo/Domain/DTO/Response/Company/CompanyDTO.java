@@ -1,4 +1,4 @@
-package com.example.demo.Domain.DTO.Response;
+package com.example.demo.Domain.DTO.Response.Company;
 
 public class CompanyDTO {
     private long id;

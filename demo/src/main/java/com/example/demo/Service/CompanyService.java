@@ -1,7 +1,7 @@
 package com.example.demo.Service;
 
 import com.example.demo.Domain.Company;
-import com.example.demo.Domain.DTO.Response.ResultPaginationDTO;
+import com.example.demo.Domain.DTO.Response.Pagination.ResultPaginationDTO;
 import com.example.demo.Domain.User;
 import com.example.demo.Repository.CompanyRepository;
 import com.example.demo.Repository.UserRepository;
