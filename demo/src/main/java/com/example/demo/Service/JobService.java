@@ -198,18 +198,18 @@ public class JobService {
     }
 
     public ResultPaginationDTO fetchListJobs(Specification<Job> specification, Pageable pageable) {
-        Page<Job> pageSkill = this.jobRepository.findAll(specification, pageable);
+        Page<Job> pageJob = this.jobRepository.findAll(specification, pageable);
         ResultPaginationDTO result = new ResultPaginationDTO();
         ResultPaginationDTO.Meta meta = new ResultPaginationDTO.Meta();
         // lấy từ pageable vì đây là 2 thông số mà frontend truyền lên
         meta.setPage(pageable.getPageNumber() + 1);
         meta.setPageSize(pageable.getPageSize());
 
-        meta.setPages(pageSkill.getTotalPages());
-        meta.setTotal(pageSkill.getTotalElements());
+        meta.setPages(pageJob.getTotalPages());
+        meta.setTotal(pageJob.getTotalElements());
         result.setMeta(meta);
         List<JobDTO> listJobs = new ArrayList<>();
-        for (Job job : pageSkill.getContent()){
+        for (Job job : pageJob.getContent()){
             JobDTO jobDTO = new JobDTO();
             jobDTO.setId(job.getId());
             jobDTO.setName(job.getName());

@@ -49,7 +49,7 @@ public class JobController {
 
     @GetMapping("/jobs")
     public ResponseEntity<RestResponse<Object>> fetchListJobs(@Filter Specification<Job> specification, Pageable pageable) {
-        ResultPaginationDTO listSkills = this.jobService.fetchListJobs(specification, pageable);
-        return this.responseUtil.buildSuccessResponse("Get list skills successfully", listSkills);
+        ResultPaginationDTO listJobs = this.jobService.fetchListJobs(specification, pageable);
+        return this.responseUtil.buildSuccessResponse("Get list skills successfully", listJobs);
     }
 }
