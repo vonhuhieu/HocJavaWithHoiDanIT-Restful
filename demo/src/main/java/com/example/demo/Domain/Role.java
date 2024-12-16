@@ -1,6 +1,7 @@
 package com.example.demo.Domain;
 
 import com.example.demo.Util.SecurityUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -31,6 +32,11 @@ public class Role {
     // ten table dat theo thu tu alphabet
     @JoinTable(name = "permission_role", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
     private List<Permission> permissions;
+
+    // 1 role => many users
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    @JsonIgnore
+    List<User> users;
 
     @PrePersist
     public void handleBeforeCreate() {
@@ -118,5 +124,13 @@ public class Role {
 
     public void setPermissions(List<Permission> permissions) {
         this.permissions = permissions;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 }

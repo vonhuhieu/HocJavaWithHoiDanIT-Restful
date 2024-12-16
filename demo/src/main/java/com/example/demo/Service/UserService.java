@@ -3,7 +3,9 @@ package com.example.demo.Service;
 import com.example.demo.Domain.Company;
 import com.example.demo.Domain.DTO.Response.Company.CompanyDTO;
 import com.example.demo.Domain.DTO.Response.Pagination.ResultPaginationDTO;
+import com.example.demo.Domain.DTO.Response.Role.RoleDTO;
 import com.example.demo.Domain.DTO.Response.User.UserFormatDataResponseDTO;
+import com.example.demo.Domain.Role;
 import com.example.demo.Domain.User;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Util.Error.ExistsByData;
@@ -23,11 +25,13 @@ public class UserService {
     private UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final CompanyService companyService;
+    private final RoleService roleService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, CompanyService companyService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, CompanyService companyService, RoleService roleService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.companyService = companyService;
+        this.roleService = roleService;
     }
 
     public UserFormatDataResponseDTO handleCreateUser(User user) {
@@ -39,6 +43,10 @@ public class UserService {
         CompanyDTO companyDTO = new CompanyDTO();
         companyDTO.setId(company.getId());
         companyDTO.setName(company.getName());
+        Role role = this.roleService.fetchRoleById(user.getRole().getId());
+        RoleDTO roleDTO = new RoleDTO();
+        roleDTO.setId(role.getId());
+        roleDTO.setName(role.getName());
         User newUser = new User();
         newUser.setEmail(user.getEmail());
         newUser.setName(user.getName());
@@ -48,6 +56,7 @@ public class UserService {
         newUser.setAge(user.getAge());
         newUser.setGender(user.getGender());
         newUser.setCompany(company);
+        newUser.setRole(role);
         this.userRepository.save(newUser);
         UserFormatDataResponseDTO newUserFormatDataResponseDTO = new UserFormatDataResponseDTO();
         newUserFormatDataResponseDTO.setId(newUser.getId());
@@ -59,6 +68,7 @@ public class UserService {
         newUserFormatDataResponseDTO.setCreatedBy(newUser.getCreatedBy());
         newUserFormatDataResponseDTO.setCreatedAt(newUser.getCreatedAt());
         newUserFormatDataResponseDTO.setCompanyDTO(companyDTO);
+        newUserFormatDataResponseDTO.setRoleDTO(roleDTO);
         return newUserFormatDataResponseDTO;
     }
 
@@ -80,6 +90,9 @@ public class UserService {
         CompanyDTO companyDTO = new CompanyDTO();
         companyDTO.setId(fetchUser.getCompany().getId());
         companyDTO.setName(fetchUser.getCompany().getName());
+        RoleDTO roleDTO = new RoleDTO();
+        roleDTO.setId(fetchUser.getRole().getId());
+        roleDTO.setName(fetchUser.getRole().getName());
         UserFormatDataResponseDTO newUserFormatDataResponseDTO = new UserFormatDataResponseDTO();
         newUserFormatDataResponseDTO.setId(fetchUser.getId());
         newUserFormatDataResponseDTO.setEmail(fetchUser.getEmail());
@@ -92,6 +105,7 @@ public class UserService {
         newUserFormatDataResponseDTO.setUpdatedBy(fetchUser.getUpdatedBy());
         newUserFormatDataResponseDTO.setUpdatedAt(fetchUser.getUpdatedAt());
         newUserFormatDataResponseDTO.setCompanyDTO(companyDTO);
+        newUserFormatDataResponseDTO.setRoleDTO(roleDTO);
         return newUserFormatDataResponseDTO;
     }
 
@@ -121,6 +135,10 @@ public class UserService {
             CompanyDTO companyDTO = new CompanyDTO();
             companyDTO.setId(company.getId());
             companyDTO.setName(company.getName());
+            Role role = user.getRole();
+            RoleDTO roleDTO = new RoleDTO();
+            roleDTO.setId(role.getId());
+            roleDTO.setName(role.getName());
             UserFormatDataResponseDTO newUserFormatDataResponseDTO = new UserFormatDataResponseDTO();
             newUserFormatDataResponseDTO.setId(user.getId());
             newUserFormatDataResponseDTO.setEmail(user.getEmail());
@@ -133,6 +151,7 @@ public class UserService {
             newUserFormatDataResponseDTO.setUpdatedBy(user.getUpdatedBy());
             newUserFormatDataResponseDTO.setUpdatedAt(user.getUpdatedAt());
             newUserFormatDataResponseDTO.setCompanyDTO(companyDTO);
+            newUserFormatDataResponseDTO.setRoleDTO(roleDTO);
             listUsers.add(newUserFormatDataResponseDTO);
         }
         result.setResult(listUsers);
@@ -145,14 +164,13 @@ public class UserService {
             throw new IDInvalidException("no exists ID " + updateUser.getId());
         }
         Company company = this.companyService.fetchCompanyById(updateUser.getCompany().getId());
-        CompanyDTO companyDTO = new CompanyDTO();
-        companyDTO.setId(company.getId());
-        companyDTO.setName(company.getName());
+        Role role = this.roleService.fetchRoleById(updateUser.getRole().getId());
         currentUser.setName(updateUser.getName());
         currentUser.setGender(updateUser.getGender());
         currentUser.setAge(updateUser.getAge());
         currentUser.setAddress(updateUser.getAddress());
         currentUser.setCompany(company);
+        currentUser.setRole(role);
         this.userRepository.save(currentUser);
         UserFormatDataResponseDTO newUserFormatDataResponseDTO = new UserFormatDataResponseDTO();
         newUserFormatDataResponseDTO.setId(currentUser.getId());
@@ -165,7 +183,14 @@ public class UserService {
         newUserFormatDataResponseDTO.setCreatedBy(currentUser.getCreatedBy());
         newUserFormatDataResponseDTO.setUpdatedBy(currentUser.getUpdatedBy());
         newUserFormatDataResponseDTO.setUpdatedAt(currentUser.getUpdatedAt());
+        CompanyDTO companyDTO = new CompanyDTO();
+        companyDTO.setId(company.getId());
+        companyDTO.setName(company.getName());
         newUserFormatDataResponseDTO.setCompanyDTO(companyDTO);
+        RoleDTO roleDTO = new RoleDTO();
+        roleDTO.setId(role.getId());
+        roleDTO.setName(role.getName());
+        newUserFormatDataResponseDTO.setRoleDTO(roleDTO);
         return newUserFormatDataResponseDTO;
     }
 

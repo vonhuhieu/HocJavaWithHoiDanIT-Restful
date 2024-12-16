@@ -90,4 +90,12 @@ public class RoleService {
         }
         this.roleRepository.deleteById(checkExistsByRole.get().getId());
     }
+
+    public Role fetchRoleById(long id){
+        Optional<Role> checkExistsByRole = this.roleRepository.findById(id);
+        if (checkExistsByRole.isEmpty()){
+            throw new IDInvalidException("No exists role whose id = " + id);
+        }
+        return checkExistsByRole.get();
+    }
 }

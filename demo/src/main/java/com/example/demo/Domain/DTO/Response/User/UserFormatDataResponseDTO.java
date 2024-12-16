@@ -1,6 +1,7 @@
 package com.example.demo.Domain.DTO.Response.User;
 
 import com.example.demo.Domain.DTO.Response.Company.CompanyDTO;
+import com.example.demo.Domain.DTO.Response.Role.RoleDTO;
 import com.example.demo.Util.Enum.GenderEnum;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.stereotype.Component;
@@ -23,13 +24,9 @@ public class UserFormatDataResponseDTO {
     @JsonProperty("company")
     private CompanyDTO companyDTO;
 
-    public CompanyDTO getCompanyDTO() {
-        return companyDTO;
-    }
+    @JsonProperty("role")
+    private RoleDTO roleDTO;
 
-    public void setCompanyDTO(CompanyDTO companyDTO) {
-        this.companyDTO = companyDTO;
-    }
 
     public Instant getUpdatedAt() {
         return updatedAt;
@@ -111,4 +108,19 @@ public class UserFormatDataResponseDTO {
         this.createdBy = createdBy;
     }
 
+    public CompanyDTO getCompanyDTO() {
+        return companyDTO;
+    }
+
+    public void setCompanyDTO(CompanyDTO companyDTO) {
+        this.companyDTO = companyDTO;
+    }
+
+    public RoleDTO getRoleDTO() {
+        return roleDTO;
+    }
+
+    public void setRoleDTO(RoleDTO roleDTO) {
+        this.roleDTO = roleDTO;
+    }
 }
