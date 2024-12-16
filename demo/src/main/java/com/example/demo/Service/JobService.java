@@ -93,7 +93,7 @@ public class JobService {
             throw new IDInvalidException("No exist Job whose id = " + job.getId());
         }
         boolean checkJobExists = this.jobRepository.existsByName(job.getName());
-        if (checkJobExists && fetchJobById.get().getId() != job.getId()){
+        if (checkJobExists){
             throw new ExistsByData("Job already exists");
         }
         Job currentJob = fetchJobById.get();

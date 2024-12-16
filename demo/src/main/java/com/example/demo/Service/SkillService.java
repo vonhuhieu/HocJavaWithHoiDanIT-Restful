@@ -42,7 +42,7 @@ public class SkillService {
             throw new IDInvalidException("Please check ID's skill");
         }
         boolean checkSkillExists = this.skillRepository.existsByName(skill.getName());
-        if (checkSkillExists && skill.getId() != checkSkillID.get().getId()){
+        if (checkSkillExists){
             throw new ExistsByData("Skill already exists. Please try again");
         }
         Skill currentSkill = checkSkillID.get();
