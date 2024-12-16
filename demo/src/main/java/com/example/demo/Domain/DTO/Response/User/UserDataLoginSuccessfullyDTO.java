@@ -1,5 +1,7 @@
 package com.example.demo.Domain.DTO.Response.User;
 
+import com.example.demo.Domain.Role;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -7,6 +9,7 @@ public class UserDataLoginSuccessfullyDTO {
     private long id;
     private String email;
     private String name;
+    private Role role;
 
     public String getName() {
         return name;
@@ -30,6 +33,14 @@ public class UserDataLoginSuccessfullyDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public static class userGetAccount{

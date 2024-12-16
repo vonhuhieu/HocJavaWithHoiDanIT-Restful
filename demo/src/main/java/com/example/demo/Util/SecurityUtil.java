@@ -1,6 +1,7 @@
 package com.example.demo.Util;
 
 import com.example.demo.Domain.DTO.Response.User.UserDataLoginSuccessfullyDTO;
+import com.example.demo.Domain.DTO.Response.User.UserFormatJWTCreateDTO;
 import com.nimbusds.jose.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -39,7 +40,7 @@ public class SecurityUtil {
     private long refreshTokenExpiration;
 
     // tạo token khi đăng nhập thành công
-    public String createAccessToken(String email, UserDataLoginSuccessfullyDTO userDataLoginSuccessfullyDTO) {
+    public String createAccessToken(String email, UserFormatJWTCreateDTO userFormatJWTCreateDTO) {
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
@@ -51,7 +52,7 @@ public class SecurityUtil {
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(email)
-                .claim("user", userDataLoginSuccessfullyDTO)
+                .claim("user", userFormatJWTCreateDTO)
                 .claim("permission", listAuthority)
                 .build();
 
@@ -59,7 +60,7 @@ public class SecurityUtil {
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
 
-    public String createRefreshToken(String email, UserDataLoginSuccessfullyDTO userDataLoginSuccessfullyDTO) {
+    public String createRefreshToken(String email, UserFormatJWTCreateDTO userFormatJWTCreateDTO) {
         Instant now = Instant.now();
         Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
 
@@ -69,7 +70,7 @@ public class SecurityUtil {
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(email)
-                .claim("user", userDataLoginSuccessfullyDTO)
+                .claim("user", userFormatJWTCreateDTO)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

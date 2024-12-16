@@ -3,9 +3,12 @@ package com.example.demo.Controller;
 import com.example.demo.Domain.DTO.Request.RequestLoginDTO;
 import com.example.demo.Domain.DTO.Response.User.UserDataLoginSuccessfullyDTO;
 import com.example.demo.Domain.DTO.Response.User.UserDataResponseLoginSuccessfullyDTO;
+import com.example.demo.Domain.DTO.Response.User.UserFormatJWTCreateDTO;
 import com.example.demo.Domain.RestResponse;
+import com.example.demo.Domain.Role;
 import com.example.demo.Domain.User;
 import com.example.demo.Repository.UserRepository;
+import com.example.demo.Service.RoleService;
 import com.example.demo.Service.UserService;
 import com.example.demo.Util.Error.IDInvalidException;
 import com.example.demo.Util.ResponseUtil;
@@ -33,15 +36,17 @@ public class AuthController {
     private final UserRepository userRepository;
     private final ResponseUtil responseUtil;
     private final UserService userService;
+    private final RoleService roleService;
     @Value("${hoidanit.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
-    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil, UserRepository userRepository, ResponseUtil responseUtil, UserService userService) {
+    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil, UserRepository userRepository, ResponseUtil responseUtil, UserService userService, RoleService roleService) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
         this.userRepository = userRepository;
         this.responseUtil = responseUtil;
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @PostMapping("/auth/login")
@@ -58,19 +63,23 @@ public class AuthController {
         // set thong tin nguoi dung login vao context (co the su dung sau nay)
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String emailUser = authentication.getName();
-        long idUser = this.userRepository.findByEmail(emailUser).getId();
-        String nameUser = this.userRepository.findByEmail(emailUser).getName();
+        User userInfo = this.userRepository.findByEmail(emailUser);
         UserDataLoginSuccessfullyDTO userDataLoginSuccessfullyDTO = new UserDataLoginSuccessfullyDTO();
-        userDataLoginSuccessfullyDTO.setId(idUser);
-        userDataLoginSuccessfullyDTO.setEmail(emailUser);
-        userDataLoginSuccessfullyDTO.setName(nameUser);
+        userDataLoginSuccessfullyDTO.setId(userInfo.getId());
+        userDataLoginSuccessfullyDTO.setEmail(userInfo.getEmail());
+        userDataLoginSuccessfullyDTO.setName(userInfo.getName());
+        userDataLoginSuccessfullyDTO.setRole(userInfo.getRole());
         UserDataResponseLoginSuccessfullyDTO userDataResponseLoginSuccessfullyDTO = new UserDataResponseLoginSuccessfullyDTO();
-        String access_token = this.securityUtil.createAccessToken(authentication.getName(), userDataLoginSuccessfullyDTO);
+        UserFormatJWTCreateDTO userFormatJWTCreateDTO = new UserFormatJWTCreateDTO();
+        userFormatJWTCreateDTO.setId(userInfo.getId());
+        userFormatJWTCreateDTO.setEmail(userInfo.getEmail());
+        userFormatJWTCreateDTO.setName(userInfo.getName());
+        String access_token = this.securityUtil.createAccessToken(authentication.getName(), userFormatJWTCreateDTO);
         userDataResponseLoginSuccessfullyDTO.setAccessToken(access_token);
         userDataResponseLoginSuccessfullyDTO.setUserDataLoginSuccessfullyDTO(userDataLoginSuccessfullyDTO);
 
         // create refreshToken
-        String refreshToken = this.securityUtil.createRefreshToken(emailUser, userDataLoginSuccessfullyDTO);
+        String refreshToken = this.securityUtil.createRefreshToken(emailUser, userFormatJWTCreateDTO);
 
         // update user
         this.userService.updateUserToken(refreshToken, emailUser);
@@ -127,9 +136,13 @@ public class AuthController {
         userDataLoginSuccessfullyDTO.setId(currentUser.getId());
         userDataLoginSuccessfullyDTO.setEmail(currentUser.getEmail());
         userDataLoginSuccessfullyDTO.setName(currentUser.getName());
-        String access_token = this.securityUtil.createAccessToken(email, userDataLoginSuccessfullyDTO);
+        UserFormatJWTCreateDTO userFormatJWTCreateDTO = new UserFormatJWTCreateDTO();
+        userFormatJWTCreateDTO.setId(currentUser.getId());
+        userFormatJWTCreateDTO.setName(currentUser.getName());
+        userFormatJWTCreateDTO.setEmail(currentUser.getEmail());
+        String access_token = this.securityUtil.createAccessToken(email, userFormatJWTCreateDTO);
         // create refreshToken
-        String newRefreshToken = this.securityUtil.createRefreshToken(email, userDataLoginSuccessfullyDTO);
+        String newRefreshToken = this.securityUtil.createRefreshToken(email, userFormatJWTCreateDTO);
 
         // update user
         this.userService.updateUserToken(newRefreshToken, email);
