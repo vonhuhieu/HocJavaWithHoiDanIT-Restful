@@ -1,7 +1,9 @@
 package com.example.demo.Service;
 
+import com.example.demo.Domain.Job;
 import com.example.demo.Domain.Skill;
 import com.example.demo.Domain.Subscriber;
+import com.example.demo.Repository.JobRepository;
 import com.example.demo.Repository.SkillRepository;
 import com.example.demo.Repository.SubscriberRepository;
 import com.example.demo.Repository.UserRepository;
@@ -18,11 +20,15 @@ public class SubscriberService {
     private final SubscriberRepository subscriberRepository;
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
+    private final JobRepository jobRepository;
+    private final EmailService emailService;
 
-    public SubscriberService(SubscriberRepository subscriberRepository, SkillRepository skillRepository, UserRepository userRepository) {
+    public SubscriberService(SubscriberRepository subscriberRepository, SkillRepository skillRepository, UserRepository userRepository, JobRepository jobRepository, EmailService emailService) {
         this.subscriberRepository = subscriberRepository;
         this.skillRepository = skillRepository;
         this.userRepository = userRepository;
+        this.jobRepository = jobRepository;
+        this.emailService = emailService;
     }
 
     public Subscriber createSubscriber(Subscriber subscriber){
@@ -56,4 +62,7 @@ public class SubscriberService {
         this.subscriberRepository.save(currentSubscriber);
         return currentSubscriber;
     }
+
+
+
 }
