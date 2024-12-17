@@ -1,8 +1,7 @@
 package com.example.demo.Service;
 
 import com.example.demo.Domain.*;
-import com.example.demo.Domain.DTO.Response.Company.CompanyDTO;
-import com.example.demo.Domain.DTO.Response.Job.JobDTO;
+
 import com.example.demo.Domain.DTO.Response.Pagination.ResultPaginationDTO;
 import com.example.demo.Domain.DTO.Response.Resume.*;
 import com.example.demo.Repository.CompanyRepository;
@@ -10,6 +9,13 @@ import com.example.demo.Repository.JobRepository;
 import com.example.demo.Repository.ResumeRepository;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.Util.Error.IDInvalidException;
+import com.example.demo.Util.SecurityUtil;
+import com.turkraft.springfilter.builder.FilterBuilder;
+import com.turkraft.springfilter.converter.FilterSpecification;
+import com.turkraft.springfilter.converter.FilterSpecificationConverter;
+import com.turkraft.springfilter.parser.FilterParser;
+import com.turkraft.springfilter.parser.node.FilterNode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,9 +24,17 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ResumeService {
+    @Autowired
+    FilterBuilder fb;
+    @Autowired
+    private FilterParser filterParser;
+    @Autowired
+    private FilterSpecificationConverter filterSpecificationConverter;
+
     private ResumeRepository resumeRepository;
     private JobRepository jobRepository;
     private UserRepository userRepository;
@@ -169,5 +183,45 @@ public class ResumeService {
         }
         result.setResult(listResumes);
         return result;
+    }
+
+    // cho user dang login xem tat ca CV cua minh
+    public ResultPaginationDTO fetchResumeByUser(Pageable pageable) {
+        // query builder
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+        FilterNode node = filterParser.parse("email='" + email + "'");
+        FilterSpecification<Resume> spec = filterSpecificationConverter.convert(node);
+        Page<Resume> pageResume = this.resumeRepository.findAll(spec, pageable);
+        ResultPaginationDTO rs = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
+        mt.setPage(pageable.getPageNumber() + 1);
+        mt.setPageSize(pageable.getPageSize());
+        mt.setPages(pageResume.getTotalPages());
+        mt.setTotal(pageResume.getTotalElements());
+        rs.setMeta(mt);
+        // remove sensitive data
+        List<ResFetchResumeDTO> resFetchResumeDTOS = new ArrayList<>();
+        for (Resume resume : pageResume.getContent()){
+            ResFetchResumeDTO resFetchResumeDTO = new ResFetchResumeDTO();
+            resFetchResumeDTO.setId(resume.getId());
+            resFetchResumeDTO.setEmail(resume.getEmail());
+            resFetchResumeDTO.setUrl(resume.getUrl());
+            resFetchResumeDTO.setStatus(resume.getStatus());
+            resFetchResumeDTO.setCreatedAt(resume.getCreatedAt());
+            resFetchResumeDTO.setCreatedBy(resume.getCreatedBy());
+            resFetchResumeDTO.setUpdatedAt(resume.getUpdatedAt());
+            resFetchResumeDTO.setUpdatedBy(resume.getUpdatedBy());
+            Company company = resume.getJob().getCompany();
+            resFetchResumeDTO.setCompanyName(company.getName());
+            User user = resume.getUser();
+            ResFetchResumeDTO.UserResume userResume = new ResFetchResumeDTO.UserResume(user.getId(), user.getName());
+            Job job = resume.getJob();
+            ResFetchResumeDTO.JobResume jobResume = new ResFetchResumeDTO.JobResume(job.getId(), job.getName());
+            resFetchResumeDTOS.add(resFetchResumeDTO);
+        }
+        rs.setResult(resFetchResumeDTOS);
+        return rs;
     }
 }

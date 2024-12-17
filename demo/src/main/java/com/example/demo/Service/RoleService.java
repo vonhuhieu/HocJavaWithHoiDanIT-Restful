@@ -50,10 +50,6 @@ public class RoleService {
         if (checkExistsByRole.isEmpty()){
             throw new IDInvalidException("No exists role whose id = " + role.getId());
         }
-        boolean checkExistsByName = this.roleRepository.existsByName(role.getName());
-        if (checkExistsByName && checkExistsByRole.get().getId() != role.getId()){
-            throw new ExistsByData("Role already exists");
-        }
         Role currentRole = checkExistsByRole.get();
         currentRole.setName(role.getName());
         currentRole.setActive(role.isActive());

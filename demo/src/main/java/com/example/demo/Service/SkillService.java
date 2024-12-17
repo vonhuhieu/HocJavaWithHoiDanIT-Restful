@@ -3,6 +3,7 @@ package com.example.demo.Service;
 import com.example.demo.Domain.DTO.Response.Pagination.ResultPaginationDTO;
 import com.example.demo.Domain.Job;
 import com.example.demo.Domain.Skill;
+import com.example.demo.Domain.Subscriber;
 import com.example.demo.Repository.JobRepository;
 import com.example.demo.Repository.SkillRepository;
 import com.example.demo.Util.Error.ExistsByData;
@@ -75,6 +76,10 @@ public class SkillService {
         // khi xoa skill luu y tim den list jobs co chua skill do va xoa di, chu khong phai xoa luon ca job
         for (Job job :listJobs){
             job.getSkills().remove(fetchSkillById.get());
+        }
+        List<Subscriber> listSubscribers = fetchSkillById.get().getSubscribers();
+        for (Subscriber subscriber : listSubscribers){
+            subscriber.getSkills().remove(fetchSkillById.get());
         }
         this.skillRepository.deleteById(fetchSkillById.get().getId());
     }

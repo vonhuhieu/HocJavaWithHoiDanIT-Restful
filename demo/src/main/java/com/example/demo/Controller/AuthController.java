@@ -110,9 +110,8 @@ public class AuthController {
         userDataLoginSuccessfullyDTO.setId(currentUser.getId());
         userDataLoginSuccessfullyDTO.setEmail(currentUser.getEmail());
         userDataLoginSuccessfullyDTO.setName(currentUser.getName());
-        UserDataLoginSuccessfullyDTO.userGetAccount userLogin = new UserDataLoginSuccessfullyDTO.userGetAccount();
-        userLogin.setUser(userDataLoginSuccessfullyDTO);
-        return this.responseUtil.buildSuccessResponse("get account successfully", userLogin);
+        userDataLoginSuccessfullyDTO.setRole(currentUser.getRole());
+        return this.responseUtil.buildSuccessResponse("get account successfully", userDataLoginSuccessfullyDTO);
     }
 
     @GetMapping("/auth/refresh")
@@ -136,6 +135,7 @@ public class AuthController {
         userDataLoginSuccessfullyDTO.setId(currentUser.getId());
         userDataLoginSuccessfullyDTO.setEmail(currentUser.getEmail());
         userDataLoginSuccessfullyDTO.setName(currentUser.getName());
+        userDataLoginSuccessfullyDTO.setRole(currentUser.getRole());
         UserFormatJWTCreateDTO userFormatJWTCreateDTO = new UserFormatJWTCreateDTO();
         userFormatJWTCreateDTO.setId(currentUser.getId());
         userFormatJWTCreateDTO.setName(currentUser.getName());
@@ -160,8 +160,6 @@ public class AuthController {
         RestResponse newRes = new RestResponse();
         newRes.setStatusCode(HttpStatus.OK.value());
         newRes.setMessage("Get user by refreshToken successfully");
-        UserDataLoginSuccessfullyDTO.userGetAccount userLogin = new UserDataLoginSuccessfullyDTO.userGetAccount();
-        userLogin.setUser(userDataLoginSuccessfullyDTO);
         UserDataResponseLoginSuccessfullyDTO userDataResponseLoginSuccessfullyDTO = new UserDataResponseLoginSuccessfullyDTO();
         userDataResponseLoginSuccessfullyDTO.setAccessToken(access_token);
         userDataResponseLoginSuccessfullyDTO.setUserDataLoginSuccessfullyDTO(userDataLoginSuccessfullyDTO);
@@ -185,5 +183,10 @@ public class AuthController {
         deleteServletCookie.setSecure(true);
         response.addCookie(deleteServletCookie);
         return this.responseUtil.buildSuccessResponse("logout successfully", null);
+    }
+
+    @PostMapping("/auth/register")
+    public ResponseEntity<RestResponse<Object>> userRegister(@Valid @RequestBody User postManUser){
+        return this.responseUtil.buildCreateResponse("register successfully", this.userService.handleCreateUser(postManUser));
     }
 }

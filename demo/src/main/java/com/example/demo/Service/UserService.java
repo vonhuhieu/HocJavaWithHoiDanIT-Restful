@@ -39,14 +39,6 @@ public class UserService {
         if (checkEmailExists){
             throw new ExistsByData("Email is already used by other person");
         }
-        Company company = this.companyService.fetchCompanyById(user.getCompany().getId());
-        CompanyDTO companyDTO = new CompanyDTO();
-        companyDTO.setId(company.getId());
-        companyDTO.setName(company.getName());
-        Role role = this.roleService.fetchRoleById(user.getRole().getId());
-        RoleDTO roleDTO = new RoleDTO();
-        roleDTO.setId(role.getId());
-        roleDTO.setName(role.getName());
         User newUser = new User();
         newUser.setEmail(user.getEmail());
         newUser.setName(user.getName());
@@ -55,8 +47,6 @@ public class UserService {
         newUser.setAddress(user.getAddress());
         newUser.setAge(user.getAge());
         newUser.setGender(user.getGender());
-        newUser.setCompany(company);
-        newUser.setRole(role);
         this.userRepository.save(newUser);
         UserFormatDataResponseDTO newUserFormatDataResponseDTO = new UserFormatDataResponseDTO();
         newUserFormatDataResponseDTO.setId(newUser.getId());
@@ -67,8 +57,6 @@ public class UserService {
         newUserFormatDataResponseDTO.setAge(newUser.getAge());
         newUserFormatDataResponseDTO.setCreatedBy(newUser.getCreatedBy());
         newUserFormatDataResponseDTO.setCreatedAt(newUser.getCreatedAt());
-        newUserFormatDataResponseDTO.setCompanyDTO(companyDTO);
-        newUserFormatDataResponseDTO.setRoleDTO(roleDTO);
         return newUserFormatDataResponseDTO;
     }
 

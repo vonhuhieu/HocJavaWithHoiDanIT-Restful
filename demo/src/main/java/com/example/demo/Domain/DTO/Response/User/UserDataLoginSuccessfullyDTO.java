@@ -42,16 +42,4 @@ public class UserDataLoginSuccessfullyDTO {
     public void setRole(Role role) {
         this.role = role;
     }
-
-    public static class userGetAccount{
-        private UserDataLoginSuccessfullyDTO user;
-
-        public UserDataLoginSuccessfullyDTO getUser() {
-            return user;
-        }
-
-        public void setUser(UserDataLoginSuccessfullyDTO user) {
-            this.user = user;
-        }
-    }
 }

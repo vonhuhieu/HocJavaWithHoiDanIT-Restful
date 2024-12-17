@@ -42,4 +42,9 @@ public class RoleController {
         this.roleService.deleteRole(id);
         return this.responseUtil.buildSuccessResponse("delete the role successfully", null);
     }
+
+    @GetMapping("/roles/{id}")
+    public ResponseEntity<RestResponse<Object>> fetchRoleById(@PathVariable("id") long id){
+        return this.responseUtil.buildSuccessResponse("fetch the role successfully", this.roleService.fetchRoleById(id));
+    }
 }
