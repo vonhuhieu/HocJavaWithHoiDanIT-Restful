@@ -15,14 +15,14 @@ import java.util.List;
 
 @ControllerAdvice
 public class GlobalException {
+    // handle all exception
     @ExceptionHandler(Exception.class)
     public ResponseEntity<RestResponse<Object>> handleGeneralException(Exception ex) {
         RestResponse<Object> res = new RestResponse<>();
-        res.setStatusCode(HttpStatus.NOT_FOUND.value());
-        res.setError("URL Error");
-        res.setMessage("Something went wrong. Please check URL or your data and try again.");
-        ex.printStackTrace();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+        res.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        res.setError("Internal Server Error");
+        res.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
     }
 
     @ExceptionHandler(value = {
